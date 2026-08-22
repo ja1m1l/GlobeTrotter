@@ -186,6 +186,8 @@ export interface TripData {
   status?: "completed" | "upcoming" | "ongoing" | string;
   tripStops?: TripStop[];
   tripActivities?: any[];
+  itinerary?: string | null;
+  expenses?: string | null;
   createdAt: string;
 }
 
@@ -254,6 +256,8 @@ export interface CreateTripPayload {
   maxBudget?: number;
   location?: string;
   cityId?: string;
+  itinerary?: string;
+  expenses?: string;
 }
 
 export const tripApi = {
@@ -296,6 +300,11 @@ export const tripApi = {
 
   getCities: () =>
     apiFetch<{ cities: City[] }>("/api/trips/cities"),
+
+  regenerateItinerary: (tripId: string) =>
+    apiFetch<{ message: string; trip: TripData }>(`/api/trips/${tripId}/regenerate-itinerary`, {
+      method: "POST",
+    }),
 };
 
 // Central helper to load all countries and their cities dynamically (with local caching)

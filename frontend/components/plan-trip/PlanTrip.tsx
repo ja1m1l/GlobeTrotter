@@ -61,6 +61,7 @@ export default function PlanTrip() {
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [maxBudget, setMaxBudget] = useState("");
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -121,6 +122,7 @@ export default function PlanTrip() {
         description: description.trim() || undefined,
         coverImage: coverImage.trim() || undefined,
         location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : undefined,
+        maxBudget: maxBudget ? parseFloat(maxBudget) : undefined,
       });
 
       // Move directly to Itinerary Builder (Screen 5)
@@ -272,6 +274,18 @@ export default function PlanTrip() {
               placeholder="https://images.unsplash.com/photo-..."
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Max Budget */}
+          <div>
+            <label style={labelStyle}>Maximum Budget (Optional)</label>
+            <input
+              type="number"
+              placeholder="e.g. 2000"
+              value={maxBudget}
+              onChange={(e) => setMaxBudget(e.target.value)}
               style={inputStyle}
             />
           </div>
