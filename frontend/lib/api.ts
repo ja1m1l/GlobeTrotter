@@ -141,3 +141,67 @@ export const authApi = {
       body: JSON.stringify({ token, newPassword }),
     }),
 };
+
+// ── Trip API ───────────────────────────────────────
+export interface City {
+  id: string;
+  name: string;
+  country: string;
+  region: string;
+  image?: string | null;
+}
+
+export interface TripStop {
+  id: string;
+  tripId: string;
+  cityId: string;
+  city: City;
+  createdAt: string;
+}
+
+export interface TripData {
+  id: string;
+  name: string;
+  description?: string | null;
+  startDate: string;
+  endDate: string;
+  coverImage?: string | null;
+  tripStops?: TripStop[];
+  createdAt: string;
+}
+
+export interface CreateTripPayload {
+  name: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+  coverImage?: string;
+  location?: string;
+  cityId?: string;
+}
+
+export const tripApi = {
+  createTrip: (payload: CreateTripPayload) =>
+    apiFetch<{ message: string; trip: TripData }>("/api/trips", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  getTripById: (id: string) =>
+    apiFetch<{ trip: TripData }>(`/api/trips/${id}`),
+
+  addTripStop: (tripId: string, payload: { cityId?: string; cityName?: string }) =>
+    apiFetch<{ message: string; tripStop: TripStop }>(`/api/trips/${tripId}/stops`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  deleteTripStop: (tripId: string, stopId: string) =>
+    apiFetch<{ message: string }>(`/api/trips/${tripId}/stops/${stopId}`, {
+      method: "DELETE",
+    }),
+
+  getCities: () =>
+    apiFetch<{ cities: City[] }>("/api/trips/cities"),
+};
+

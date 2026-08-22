@@ -226,6 +226,7 @@ export default function LandingPage() {
                 const s = STATUS_STYLE[trip.status];
                 return (
                   <div key={trip.id} style={{ ...glassCard, padding: 0, overflow: "hidden", cursor: "pointer", transition: "all 0.25s" }}
+                    onClick={() => router.push(`/itinerary/${trip.id}`)}
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(45,212,191,0.25)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}
                   >
@@ -253,7 +254,7 @@ export default function LandingPage() {
 
       {/* ── FAB ── */}
       <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 50 }}>
-        <button onClick={() => setIsModalOpen(true)}
+        <button onClick={() => router.push("/plan-trip")}
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "13px 22px", background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 6px 28px rgba(20,184,166,0.4)", transition: "all 0.2s" }}
           onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 36px rgba(20,184,166,0.6)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 6px 28px rgba(20,184,166,0.4)"; e.currentTarget.style.transform = "translateY(0)"; }}
