@@ -1,0 +1,335 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getUser, tripApi, City } from "@/lib/api";
+
+const SUGGESTIONS = [
+  {
+    id: "s1",
+    title: "Eiffel Tower & Seine Cruise",
+    location: "Paris, France",
+    image: "🏰",
+    description: "Explore iconic landmarks and romantic river cruises.",
+  },
+  {
+    id: "s2",
+    title: "Tokyo Ramen & Temple Tour",
+    location: "Tokyo, Japan",
+    image: "⛩️",
+    description: "Immerse in Japanese culture and legendary street food.",
+  },
+  {
+    id: "s3",
+    title: "Colosseum & Roman Forum",
+    location: "Rome, Italy",
+    image: "🏛️",
+    description: "Walk through ancient history and authentic trattorias.",
+  },
+  {
+    id: "s4",
+    title: "Swiss Alps Hiking Trail",
+    location: "Zurich, Switzerland",
+    image: "🏔️",
+    description: "Breathtaking mountain peaks and Alpine lake views.",
+  },
+  {
+    id: "s5",
+    title: "Bali Beach & Temple Retreat",
+    location: "Bali, Indonesia",
+    image: "🏝️",
+    description: "Tropical beaches, rice terraces, and serene retreats.",
+  },
+  {
+    id: "s6",
+    title: "New York Skyline & Broadway",
+    location: "New York, USA",
+    image: "🗽",
+    description: "The vibrant heartbeat of Central Park and Broadway shows.",
+  },
+];
+
+export default function PlanTrip() {
+  const router = useRouter();
+  const [user, setUser] = useState<{ firstName?: string } | null>(null);
+
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [description, setDescription] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [cities, setCities] = useState<City[]>([]);
+
+  useEffect(() => {
+    setUser(getUser());
+    // Load available cities from DB
+    tripApi
+      .getCities()
+      .then((res) => setCities(res.cities || []))
+      .catch(() => {});
+  }, []);
+
+  const handleSelectSuggestion = (s: typeof SUGGESTIONS[0]) => {
+    setSelectedSuggestion(s.id);
+    if (!location) setLocation(s.location);
+    if (!description) setDescription(`Selected Activity: ${s.title}. ${s.description}`);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!name.trim()) {
+      setError("Please enter a Trip Name.");
+      return;
+    }
+    if (!startDate) {
+      setError("Please select a Start Date.");
+      return;
+    }
+    if (!endDate) {
+      setError("Please select an End Date.");
+      return;
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      setError("End Date cannot be earlier than Start Date.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await tripApi.createTrip({
+        name: name.trim(),
+        startDate,
+        endDate,
+        description: description.trim() || undefined,
+        coverImage: coverImage.trim() || undefined,
+        location: location.trim() || undefined,
+      });
+
+      // Move directly to Itinerary Builder (Screen 5)
+      router.push(`/itinerary/${res.trip.id}`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create trip.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#07090c", color: "#fff", fontFamily: "'Inter', system-ui, sans-serif", paddingBottom: 80 }}>
+      {/* Background Orbs */}
+      <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%)", top: "-15%", right: "-10%", pointerEvents: "none", zIndex: 0 }} />
+
+      {/* Header */}
+      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
+          GlobeTrotter
+        </button>
+        <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
+          {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+        </div>
+      </header>
+
+      <main style={{ maxWidth: 860, margin: "0 auto", padding: "32px 20px", display: "flex", flexDirection: "column", gap: 28, position: "relative", zIndex: 1 }}>
+        {/* Title */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Plan a new trip</h1>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Enter trip details to build your custom itinerary</p>
+          </div>
+          <button onClick={() => router.push("/")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+            ← Back
+          </button>
+        </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "12px 16px", fontSize: 13, color: "#f87171", display: "flex", alignItems: "center", gap: 8 }}>
+            <span>⚠️</span> {error}
+          </div>
+        )}
+
+        {/* Form Card */}
+        <form onSubmit={handleSubmit} style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Trip Name */}
+          <div>
+            <label style={labelStyle}>Trip Name <span style={{ color: "#2dd4bf" }}>*</span></label>
+            <input
+              type="text"
+              placeholder="e.g. Summer in Paris & Swiss Alps"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Select a Place / Location */}
+          <div>
+            <label style={labelStyle}>Select a Place / Destination</label>
+            <input
+              type="text"
+              placeholder="e.g. Paris, France or Tokyo, Japan"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              list="city-suggestions"
+              style={inputStyle}
+            />
+            {cities.length > 0 && (
+              <datalist id="city-suggestions">
+                {cities.map((c) => (
+                  <option key={c.id} value={`${c.name}, ${c.country}`} />
+                ))}
+              </datalist>
+            )}
+          </div>
+
+          {/* Start Date & End Date Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div>
+              <label style={labelStyle}>Start Date <span style={{ color: "#2dd4bf" }}>*</span></label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+                style={inputStyle}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>End Date <span style={{ color: "#2dd4bf" }}>*</span></label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                required
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          {/* Trip Description */}
+          <div>
+            <label style={labelStyle}>Trip Description / Notes</label>
+            <textarea
+              rows={3}
+              placeholder="Describe your travel goals, places you want to visit, or highlights..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              style={{ ...inputStyle, resize: "vertical" }}
+            />
+          </div>
+
+          {/* Optional: Cover Photo URL */}
+          <div>
+            <label style={labelStyle}>Cover Photo URL (Optional)</label>
+            <input
+              type="url"
+              placeholder="https://images.unsplash.com/photo-..."
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 8 }}>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                padding: "14px 28px",
+                background: loading ? "rgba(20,184,166,0.4)" : "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)",
+                border: "none",
+                borderRadius: 12,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: "0 4px 20px rgba(20,184,166,0.3)",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                transition: "all 0.2s",
+                fontFamily: "inherit",
+              }}
+            >
+              {loading ? (
+                <>Saving & Creating Trip...</>
+              ) : (
+                <>Save & Build Itinerary →</>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Suggestion Section for Places to Visit / Activities */}
+        <section style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>
+            Suggestion for Places to Visit / Activities to perform
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 14 }}>
+            {SUGGESTIONS.map((s) => {
+              const isSelected = selectedSuggestion === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => handleSelectSuggestion(s)}
+                  style={{
+                    ...cardStyle,
+                    padding: 16,
+                    cursor: "pointer",
+                    border: `1.5px solid ${isSelected ? "rgba(45,212,191,0.6)" : "rgba(255,255,255,0.07)"}`,
+                    background: isSelected ? "rgba(45,212,191,0.08)" : "rgba(255,255,255,0.03)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>{s.image}</div>
+                  <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{s.title}</h3>
+                  <span style={{ fontSize: 11, color: "#2dd4bf", fontWeight: 600, display: "block", marginBottom: 6 }}>{s.location}</span>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{s.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+const cardStyle: React.CSSProperties = {
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 18,
+  padding: 24,
+  backdropFilter: "blur(12px)",
+  WebkitBackdropFilter: "blur(12px)",
+};
+
+const labelStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: 12,
+  fontWeight: 600,
+  color: "rgba(255,255,255,0.6)",
+  marginBottom: 6,
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "12px 14px",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 10,
+  color: "#fff",
+  fontSize: 14,
+  fontFamily: "inherit",
+  outline: "none",
+};
