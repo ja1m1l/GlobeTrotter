@@ -60,7 +60,7 @@ const SAMPLE_EVENTS: CalendarEvent[] = [
   },
 ];
 
-const WEEKDAYS = ["SUM", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 export default function CalendarView() {
   const router = useRouter();
@@ -250,7 +250,7 @@ export default function CalendarView() {
         </div>
 
         {/* Main White/Light Calendar Card (EXACT MATCH FOR WIREFRAME) */}
-        <div style={{ background: "#ffffff", borderRadius: 20, color: "#111827", padding: "28px 24px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+        <div style={{ background: "#ffffff", borderRadius: 20, color: "#111827", padding: "28px 24px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", overflow: "hidden", boxSizing: "border-box" }}>
           {/* Month Header Navigation (←  Month Year  →) */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, padding: "0 10px" }}>
             <button
@@ -271,14 +271,14 @@ export default function CalendarView() {
           </div>
 
           {/* Weekday Labels Header */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderBottom: "1px solid #e5e7eb", paddingBottom: 12, textAlign: "center", fontWeight: 800, fontSize: 13, color: "#4b5563" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderBottom: "1px solid #e5e7eb", paddingBottom: 12, textAlign: "center", fontWeight: 800, fontSize: 13, color: "#4b5563", boxSizing: "border-box" }}>
             {WEEKDAYS.map((w, i) => (
               <div key={i}>{w}</div>
             ))}
           </div>
 
           {/* Calendar Grid Cells */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderLeft: "1px solid #e5e7eb", borderTop: "1px solid #e5e7eb" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderLeft: "1px solid #e5e7eb", borderTop: "1px solid #e5e7eb", width: "100%", boxSizing: "border-box", borderRadius: "0 0 12px 12px", overflow: "hidden" }}>
             {/* Empty Leading Blank Cells */}
             {Array.from({ length: firstDayOfWeek }).map((_, i) => (
               <div key={`blank-${i}`} style={calendarCellEmptyStyle} />
@@ -448,6 +448,8 @@ const calendarCellStyle: React.CSSProperties = {
   padding: 6,
   borderRight: "1px solid #e5e7eb",
   borderBottom: "1px solid #e5e7eb",
+  boxSizing: "border-box",
+  overflow: "hidden",
   cursor: "pointer",
   display: "flex",
   flexDirection: "column",
@@ -460,6 +462,7 @@ const calendarCellEmptyStyle: React.CSSProperties = {
   background: "#f9fafb",
   borderRight: "1px solid #e5e7eb",
   borderBottom: "1px solid #e5e7eb",
+  boxSizing: "border-box",
 };
 
 const reorderButtonStyle: React.CSSProperties = {
