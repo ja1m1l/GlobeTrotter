@@ -12,29 +12,16 @@ interface ExpenseItem {
   cost: number;
 }
 
-const DEFAULT_EXPENSES: ExpenseItem[] = [
-  { id: "e1", day: 1, activityTitle: "Flight JFK -> CDG Paris & Airport Transfer", category: "Transport", cost: 650 },
-  { id: "e2", day: 1, activityTitle: "Hotel Check-in: Le Grand Paris (Night 1)", category: "Stay", cost: 240 },
-  { id: "e3", day: 1, activityTitle: "Welcome Dinner at Le Train Bleu", category: "Meals", cost: 85 },
-  { id: "e4", day: 2, activityTitle: "Eiffel Tower Priority Summit Pass", category: "Activities", cost: 45 },
-  { id: "e5", day: 2, activityTitle: "Louvre Museum Guided Art Tour", category: "Activities", cost: 65 },
-  { id: "e6", day: 2, activityTitle: "Montmartre Bakery & Wine Tasting", category: "Meals", cost: 60 },
-  { id: "e7", day: 2, activityTitle: "Hotel Stay: Le Grand Paris (Night 2)", category: "Stay", cost: 240 },
-  { id: "e8", day: 3, activityTitle: "High-Speed TGV Train Paris to Zurich", category: "Transport", cost: 180 },
-  { id: "e9", day: 3, activityTitle: "Swiss Alps Cable Car Pass", category: "Activities", cost: 95 },
-  { id: "e10", day: 3, activityTitle: "Alpine Fondue Dinner in Zurich", category: "Meals", cost: 75 },
-];
-
 export default function TripBudget() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
 
-  // Retrieve trip ID from route params (/trip-budget/[tripId]) or query param (?tripId=...)
   const tripId = (params?.tripId as string) || searchParams.get("tripId") || "";
 
   const [user, setUser] = useState<{ firstName?: string } | null>(null);
   const [trip, setTrip] = useState<TripData | null>(null);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Target Budget Limit (Default $2,000)
@@ -55,10 +42,16 @@ export default function TripBudget() {
         .then((res) => {
           setTrip(res.trip);
           if (res.trip.maxBudget) setTargetBudget(res.trip.maxBudget);
+          if (res.trip.expenses) {
+            try {
+              setExpenses(JSON.parse(res.trip.expenses));
+            } catch (e) {
+              console.error("Failed to parse budget expenses:", e);
+            }
+          }
           setLoading(false);
         })
         .catch(() => {
-          // Demo fallback
           setTrip({
             id: tripId || "demo-trip",
             name: "Summer European Getaway",
@@ -75,7 +68,7 @@ export default function TripBudget() {
 
   // Dynamic Expenses calculations
   const filteredExpenses = useMemo(() => {
-    return DEFAULT_EXPENSES.filter((item) => {
+    let list = expenses.filter((item) => {
       const matchesSearch =
         !searchQuery.trim() ||
         item.activityTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -83,18 +76,25 @@ export default function TripBudget() {
       const matchesCat = categoryFilter === "all" || item.category === categoryFilter;
       return matchesSearch && matchesCat;
     });
-  }, [searchQuery, categoryFilter]);
+
+    if (sortBy === "cost_desc") {
+      list = [...list].sort((a, b) => b.cost - a.cost);
+    } else {
+      list = [...list].sort((a, b) => a.day - b.day);
+    }
+    return list;
+  }, [expenses, searchQuery, categoryFilter, sortBy]);
 
   // Breakdown amounts by category
   const breakdown = useMemo(() => {
     const res = { Transport: 0, Stay: 0, Activities: 0, Meals: 0 };
-    DEFAULT_EXPENSES.forEach((item) => {
+    expenses.forEach((item) => {
       if (res[item.category] !== undefined) {
         res[item.category] += item.cost;
       }
     });
     return res;
-  }, []);
+  }, [expenses]);
 
   const totalCost = useMemo(() => {
     return Object.values(breakdown).reduce((a, b) => a + b, 0);
@@ -224,7 +224,7 @@ export default function TripBudget() {
               ${totalCost.toLocaleString()}
             </h2>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-              {tripDaysCount} Days Trip • {DEFAULT_EXPENSES.length} expense items
+              {tripDaysCount} Days Trip • {expenses.length} expense items
             </span>
           </div>
 

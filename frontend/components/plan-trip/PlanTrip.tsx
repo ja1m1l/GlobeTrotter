@@ -61,8 +61,7 @@ export default function PlanTrip() {
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState("");
-  const coverImageFileRef = useRef<HTMLInputElement>(null);
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [maxBudget, setMaxBudget] = useState("");
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
@@ -126,6 +125,7 @@ export default function PlanTrip() {
         description: description.trim() || undefined,
         coverImage: uploadedCoverImage,
         location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : undefined,
+        maxBudget: maxBudget ? parseFloat(maxBudget) : undefined,
       });
 
       // Move directly to Itinerary Builder (Screen 5)
@@ -288,6 +288,18 @@ export default function PlanTrip() {
               placeholder="Or paste an image URL"
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Max Budget */}
+          <div>
+            <label style={labelStyle}>Maximum Budget (Optional)</label>
+            <input
+              type="number"
+              placeholder="e.g. 2000"
+              value={maxBudget}
+              onChange={(e) => setMaxBudget(e.target.value)}
               style={inputStyle}
             />
           </div>
