@@ -61,6 +61,8 @@ export default function PlanTrip() {
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const coverImageFileRef = useRef<HTMLInputElement>(null);
   const [maxBudget, setMaxBudget] = useState("");
   const [selectedSuggestion, setSelectedSuggestion] = useState<string | null>(null);
 
