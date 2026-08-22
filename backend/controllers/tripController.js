@@ -142,6 +142,12 @@ exports.getTripById = async (req, res) => {
           },
           orderBy: { createdAt: 'asc' },
         },
+        tripActivities: {
+          include: {
+            activity: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
@@ -164,7 +170,7 @@ exports.updateTrip = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
-    const { name, description, startDate, endDate, coverImage } = req.body;
+    const { name, description, startDate, endDate, coverImage, maxBudget } = req.body;
 
     const trip = await prisma.trip.findFirst({
       where: { id, userId },
@@ -178,6 +184,7 @@ exports.updateTrip = async (req, res) => {
     if (name !== undefined) dataToUpdate.name = name;
     if (description !== undefined) dataToUpdate.description = description;
     if (coverImage !== undefined) dataToUpdate.coverImage = coverImage;
+    if (maxBudget !== undefined && !isNaN(parseFloat(maxBudget))) dataToUpdate.maxBudget = parseFloat(maxBudget);
 
     if (startDate) {
       const s = new Date(startDate);

@@ -57,6 +57,7 @@ model Trip {
   startDate      DateTime
   endDate        DateTime
   coverImage     String?
+  maxBudget      Float          @default(2000.0)
   tripStops      TripStop[]
   tripActivities TripActivity[]
   createdAt      DateTime       @default(now())

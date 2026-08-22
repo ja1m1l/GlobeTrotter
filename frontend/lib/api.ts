@@ -181,9 +181,11 @@ export interface TripData {
   startDate: string;
   endDate: string;
   coverImage?: string | null;
+  maxBudget?: number;
   destinationCount?: number;
   status?: "completed" | "upcoming" | "ongoing" | string;
   tripStops?: TripStop[];
+  tripActivities?: any[];
   createdAt: string;
 }
 
@@ -249,6 +251,7 @@ export interface CreateTripPayload {
   endDate?: string;
   description?: string;
   coverImage?: string;
+  maxBudget?: number;
   location?: string;
   cityId?: string;
 }
