@@ -46,13 +46,13 @@ export default function ForgotPasswordPage() {
 
         {error && (
           <div style={{ width: "100%", marginBottom: 14, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "11px 14px", fontSize: 13, color: "rgba(255,255,255,0.75)", display: "flex", gap: 8 }}>
-            <span>⚠️</span>{error}
+            <span style={{ display: "inline-flex", alignItems: "center" }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" /></svg></span>{error}
           </div>
         )}
 
         {success ? (
           <div style={{ width: "100%", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 12, padding: "20px", textAlign: "center" }}>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>📬</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(45,212,191,0.8)" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Zm0 0 8 6 8-6" /></svg></div>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>{success}</p>
             <Link href="/login" style={{ display: "inline-block", marginTop: 16, fontSize: 13, color: "#2dd4bf", fontWeight: 600, textDecoration: "none" }}>
               ← Back to Login

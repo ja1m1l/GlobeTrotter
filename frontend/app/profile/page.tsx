@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
+import { AlertTriangle, Mail, Phone, MapPin, Pencil } from "lucide-react";
 
 const REGION_IMAGES: Record<string, string> = {
   Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
@@ -158,7 +159,7 @@ export default function ProfilePage() {
           </svg>
         </div>
       ) : error ? (
-        <main style={mainStyle}><div style={errorCardStyle}>⚠️ {error}</div></main>
+        <main style={mainStyle}><div style={errorCardStyle}><AlertTriangle className="inline w-4 h-4 mr-1" /> {error}</div></main>
       ) : (
         <main style={mainStyle}>
           {/* ── User Details Card (Edit Option) ── */}
@@ -259,9 +260,9 @@ export default function ProfilePage() {
                       </div>
                       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5, margin: "6px 0 10px" }}>{user?.additionalInfo || "No bio added yet."}</p>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8, fontSize: 13 }}>
-                        <DetailRow label="📧 Email" value={user?.email} />
-                        <DetailRow label="📞 Phone" value={user?.phoneNumber || "Not provided"} />
-                        <DetailRow label="📍 Location" value={user?.city && user?.country ? `${user.city}, ${user.country}` : user?.city || user?.country || "Not provided"} />
+                        <DetailRow label={<><Mail className="inline w-3 h-3 mr-1" /> Email</>} value={user?.email} />
+                        <DetailRow label={<><Phone className="inline w-3 h-3 mr-1" /> Phone</>} value={user?.phoneNumber || "Not provided"} />
+                        <DetailRow label={<><MapPin className="inline w-3 h-3 mr-1" /> Location</>} value={user?.city && user?.country ? `${user.city}, ${user.country}` : user?.city || user?.country || "Not provided"} />
                       </div>
                     </div>
                   )}
@@ -280,7 +281,7 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <button type="button" onClick={() => setEditMode(true)} style={editToggleStyle}>
-                    ✏️ Edit Profile
+                    <Pencil className="inline w-3 h-3 mr-1" /> Edit Profile
                   </button>
                 )}
               </div>
@@ -334,7 +335,7 @@ function InputField({ label, type = "text", value, onChange, required }: {
   );
 }
 
-function DetailRow({ label, value }: { label: string; value?: string | null }) {
+function DetailRow({ label, value }: { label: React.ReactNode; value?: string | null }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>

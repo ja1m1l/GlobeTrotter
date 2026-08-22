@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { AlertTriangle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { authApi } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
@@ -66,13 +67,13 @@ function ResetPasswordForm() {
 
       {error && (
         <div style={{ width: "100%", marginBottom: 14, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "11px 14px", fontSize: 13, color: "rgba(255,255,255,0.75)", display: "flex", gap: 8 }}>
-          <span>⚠️</span>{error}
+          <span style={{ display: "inline-flex", alignItems: "center" }}><AlertTriangle size={15} strokeWidth={2} /></span>{error}
         </div>
       )}
 
       {success ? (
         <div style={{ width: "100%", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 12, padding: "20px", textAlign: "center" }}>
-          <div style={{ fontSize: 32, marginBottom: 10 }}>🎉</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 10 }}><CheckCircle2 size={30} strokeWidth={2} color="rgba(45,212,191,0.8)" /></div>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", lineHeight: 1.6 }}>{success}</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 8 }}>Redirecting you to login...</p>
         </div>
@@ -94,7 +95,7 @@ function ResetPasswordForm() {
               style={{ width: "100%", padding: "13px 16px 13px 40px", paddingRight: 46, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none" }}
             />
             <button type="button" onClick={() => setShowPwd(!showPwd)} style={eyeButtonStyle}>
-              {showPwd ? "🙈" : "👁️"}
+              {showPwd ? <EyeOff size={16} strokeWidth={1.8} /> : <Eye size={16} strokeWidth={1.8} />}
             </button>
           </div>
 
@@ -114,7 +115,7 @@ function ResetPasswordForm() {
               style={{ width: "100%", padding: "13px 16px 13px 40px", paddingRight: 46, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none" }}
             />
             <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={eyeButtonStyle}>
-              {showConfirm ? "🙈" : "👁️"}
+              {showConfirm ? <EyeOff size={16} strokeWidth={1.8} /> : <Eye size={16} strokeWidth={1.8} />}
             </button>
           </div>
 

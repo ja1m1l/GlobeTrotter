@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authApi, setToken, setUser, uploadProfileImage } from "@/lib/api";
+import { AlertTriangle } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -211,7 +212,7 @@ export default function RegisterPage() {
 function ErrorBanner({ message, onClose }: { message: string; onClose: () => void }) {
   return (
     <div style={{ width: "100%", marginBottom: 12, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "11px 14px", display: "flex", alignItems: "flex-start", gap: 10 }}>
-      <span style={{ fontSize: 15 }}>⚠️</span>
+      <span style={{ fontSize: 15 }}><AlertTriangle className="w-4 h-4" /></span>
       <span style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", flex: 1 }}>{message}</span>
       <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: 16, padding: 0 }}>×</button>
     </div>

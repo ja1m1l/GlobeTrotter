@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AlertTriangle, ArrowLeft, ShieldCheck } from "lucide-react";
 import { authApi, setToken, setUser } from "@/lib/api";
 
 export default function AdminLogin() {
@@ -43,8 +44,8 @@ export default function AdminLogin() {
 
       <div style={{ width: "100%", maxWidth: 420, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, padding: "36px 32px", backdropFilter: "blur(16px)", boxShadow: "0 24px 80px rgba(0,0,0,0.8)", position: "relative", zIndex: 1 }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ display: "inline-flex", padding: "6px 14px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 99, color: "#f87171", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-            🔒 GlobeTrotter Admin Portal
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 99, color: "#f87171", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
+            <ShieldCheck size={12} strokeWidth={2} /> GlobeTrotter Admin Portal
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "#fff", margin: "4px 0 6px" }}>Admin Sign In</h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
@@ -53,8 +54,8 @@ export default function AdminLogin() {
         </div>
 
         {error && (
-          <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "12px 16px", color: "#f87171", fontSize: 13, marginBottom: 20 }}>
-            ⚠️ {error}
+          <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "12px 16px", color: "#f87171", fontSize: 13, marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <AlertTriangle size={14} strokeWidth={2} /> {error}
           </div>
         )}
 
@@ -93,8 +94,8 @@ export default function AdminLogin() {
         </form>
 
         <div style={{ textAlign: "center", marginTop: 24, paddingTop: 18, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer" }}>
-            ← Return to User App
+          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 12, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <ArrowLeft size={12} strokeWidth={2} /> Return to User App
           </button>
         </div>
       </div>

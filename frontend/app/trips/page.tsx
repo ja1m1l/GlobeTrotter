@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { AlertTriangle, ArrowLeft, CalendarDays, Plus, Search, Trash2 } from "lucide-react";
 import { isAuthenticated, clearAuth, getUser, dashboardApi, tripApi, TripData, User } from "@/lib/api";
 
 const REGION_IMAGES: Record<string, string> = {
@@ -125,11 +126,11 @@ export default function TripsPage() {
       <header style={headerStyle}>
         <Link href="/" style={{ textDecoration: "none", color: "#fff", display: "flex", alignItems: "center", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20 }}>
           {/* Logo empty space — handles text in layout */}
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}
             onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
             onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
           >
-            ← Dashboard
+            <ArrowLeft size={14} strokeWidth={2} /> Dashboard
           </span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -154,7 +155,7 @@ export default function TripsPage() {
         <section style={controlsStyle}>
           <div style={{ flex: "1 1 240px", position: "relative" }}>
             <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", pointerEvents: "none" }}>
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
+              <Search size={14} strokeWidth={2} />
             </span>
             <input
               type="text"
@@ -198,7 +199,7 @@ export default function TripsPage() {
             </svg>
           </div>
         ) : error ? (
-          <div style={errorCardStyle}>⚠️ {error}</div>
+          <div style={errorCardStyle}><span style={{ display: "inline-flex", alignItems: "center", marginRight: 8 }}><AlertTriangle size={14} strokeWidth={2} /></span>{error}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
 
@@ -260,7 +261,7 @@ export default function TripsPage() {
           onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 36px rgba(20,184,166,0.6)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 6px 28px rgba(20,184,166,0.4)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>
+          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Plus size={18} strokeWidth={2.5} /></span>
           Plan a trip
         </button>
       </div>
@@ -351,12 +352,12 @@ function TripRowCard({ trip, onDelete }: { trip: TripData; onDelete: (e: React.M
       <div style={{ flex: 1, minWidth: 0 }}>
         <h3 style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.name}</h3>
         <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.description || "No description provided"}</p>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>📅 {start} — {end}</span>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", display: "inline-flex", alignItems: "center", gap: 4 }}><CalendarDays size={11} strokeWidth={2} /> {start} — {end}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
         <span style={badgeStyle(trip.status || "upcoming")}>{trip.status || "upcoming"}</span>
         <button onClick={onDelete} style={deleteButtonStyle}>
-          🗑️
+          <Trash2 size={12} strokeWidth={2} />
         </button>
       </div>
     </div>

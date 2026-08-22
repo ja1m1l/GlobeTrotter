@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getUser, tripApi, City, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
+import { AlertTriangle } from "lucide-react";
 
 const SUGGESTIONS = [
   {
@@ -174,7 +175,7 @@ export default function PlanTrip() {
         {/* Error Alert */}
         {error && (
           <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 12, padding: "12px 16px", fontSize: 13, color: "#f87171", display: "flex", alignItems: "center", gap: 8 }}>
-            <span>⚠️</span> {error}
+            <span><AlertTriangle size={15} /></span> {error}
           </div>
         )}
 

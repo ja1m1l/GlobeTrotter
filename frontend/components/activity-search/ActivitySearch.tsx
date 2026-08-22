@@ -2,15 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ArrowLeft,
+  Check,
+  Clock3,
+  DollarSign,
+  MapPin,
+  Plus,
+  Search,
+  Star,
+  Target,
+} from "lucide-react";
 import { activityApi, ActivityItem, TripActivityItem, getUser } from "@/lib/api";
 
 const CATEGORIES = [
   { id: "all", label: "All Categories" },
-  { id: "Sightseeing", label: "🏰 Sightseeing" },
-  { id: "Food & Dining", label: "🍜 Food & Dining" },
-  { id: "Culture", label: "🏛️ Culture & History" },
-  { id: "Adventure", label: "🏔️ Adventure & Nature" },
-  { id: "Relaxation", label: "🏝️ Relaxation & Spa" },
+  { id: "Sightseeing", label: "Sightseeing" },
+  { id: "Food & Dining", label: "Food & Dining" },
+  { id: "Culture", label: "Culture & History" },
+  { id: "Adventure", label: "Adventure & Nature" },
+  { id: "Relaxation", label: "Relaxation & Spa" },
 ];
 
 const COST_TYPES = [
@@ -138,20 +149,22 @@ export default function ActivitySearch() {
       {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}
             onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
             onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
           >
-            ← Dashboard
+            <ArrowLeft size={14} strokeWidth={2} />
+            Dashboard
           </span>
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {tripIdParam && (
             <button
               onClick={() => router.push(`/itinerary/${tripIdParam}`)}
-              style={{ background: "rgba(45,212,191,0.15)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "8px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+              style={{ background: "rgba(45,212,191,0.15)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "8px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
-              ← Back to Itinerary
+              <ArrowLeft size={14} strokeWidth={2} />
+              Back to Itinerary
             </button>
           )}
           <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
@@ -176,7 +189,7 @@ export default function ActivitySearch() {
           {/* Top Search Input */}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ flex: 1, minWidth: 240, position: "relative" }}>
-              <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 14, color: "rgba(255,255,255,0.4)" }}>🔍</span>
+              <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.4)" }}><Search size={14} strokeWidth={2} /></span>
               <input
                 type="text"
                 placeholder="Search activities (e.g. Paragliding, Museum, Food Tour)..."
@@ -187,7 +200,7 @@ export default function ActivitySearch() {
             </div>
             {selectedCity && (
               <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(45,212,191,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "8px 14px", fontSize: 13, color: "#2dd4bf" }}>
-                <span>📍 {selectedCity}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><MapPin size={12} strokeWidth={2} /> {selectedCity}</span>
                 <button onClick={() => setSelectedCity("")} style={{ background: "none", border: "none", color: "#2dd4bf", cursor: "pointer", fontSize: 14 }}>×</button>
               </div>
             )}
@@ -253,8 +266,8 @@ export default function ActivitySearch() {
               Searching activities...
             </div>
           ) : activities.length === 0 ? (
-            <div style={{ ...cardStyle, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.4)" }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>🔍</div>
+            <div style={{ ...cardStyle, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.4)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div style={{ marginBottom: 10 }}><Search size={36} color="rgba(255,255,255,0.4)" /></div>
               No activities found matching your filters. Try clearing search or selecting different options!
             </div>
           ) : (
@@ -299,11 +312,10 @@ export default function ActivitySearch() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: 32,
                           flexShrink: 0,
                         }}
                       >
-                        🎯
+                        <Target size={28} strokeWidth={1.8} color="rgba(255,255,255,0.7)" />
                       </div>
                     )}
 
@@ -314,9 +326,9 @@ export default function ActivitySearch() {
                           {act.category}
                         </span>
                         {act.cityName && (
-                          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>📍 {act.cityName}</span>
+                          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", display: "inline-flex", alignItems: "center", gap: 4 }}><MapPin size={11} strokeWidth={2} /> {act.cityName}</span>
                         )}
-                        <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 700 }}>★ {act.rating}</span>
+                        <span style={{ fontSize: 11, color: "#f59e0b", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 4 }}><Star size={11} strokeWidth={2} fill="currentColor" /> {act.rating}</span>
                         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>({act.popularity}% popular)</span>
                       </div>
 
@@ -324,8 +336,8 @@ export default function ActivitySearch() {
                       <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: 0, lineHeight: 1.4 }}>{act.description}</p>
 
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600 }}>⏱️ {act.duration}</span>
-                        <span style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 700 }}>💵 {act.costType} (${act.costAmount})</span>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5 }}><Clock3 size={12} strokeWidth={2} /> {act.duration}</span>
+                        <span style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}><DollarSign size={12} strokeWidth={2} /> {act.costType} (${act.costAmount})</span>
                       </div>
                     </div>
 
@@ -346,7 +358,7 @@ export default function ActivitySearch() {
                           fontFamily: "inherit",
                         }}
                       >
-                        {isAdded ? "Added ✓ (Click to Remove)" : "+ Add to Trip"}
+                        {isAdded ? <><Check size={14} strokeWidth={2.5} /> Added (Click to Remove)</> : <><Plus size={14} strokeWidth={2.5} /> Add to Trip</>}
                       </button>
                     </div>
                   </div>

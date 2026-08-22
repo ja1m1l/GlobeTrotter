@@ -3,20 +3,21 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { communityApi, CommunityPostItem, getUser, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
+import { Search, MessageSquare, MapPin, Heart, MessageCircle, Bookmark } from "lucide-react";
 
 const REGIONS = [
   { id: "all", label: "All Regions" },
-  { id: "Europe", label: "🇪🇺 Europe" },
-  { id: "Asia", label: "🇯🇵 Asia" },
-  { id: "Americas", label: "🗽 Americas" },
+  { id: "Europe", label: "Europe" },
+  { id: "Asia", label: "Asia" },
+  { id: "Americas", label: "Americas" },
 ];
 
 const CATEGORIES = [
   { id: "all", label: "All Categories" },
-  { id: "Travel Story", label: "📖 Travel Story" },
-  { id: "Itinerary & Tips", label: "🗺️ Itinerary & Tips" },
-  { id: "Adventure", label: "🏔️ Adventure" },
-  { id: "Culture & History", label: "🏛️ Culture & History" },
+  { id: "Travel Story", label: "Travel Story" },
+  { id: "Itinerary & Tips", label: "Itinerary & Tips" },
+  { id: "Adventure", label: "Adventure" },
+  { id: "Culture & History", label: "Culture & History" },
 ];
 
 const SORT_OPTIONS = [
@@ -187,7 +188,7 @@ export default function CommunityTab() {
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
           {/* Search bar */}
           <div style={{ flex: 1, minWidth: 220, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>🔍</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", display: "flex" }}><Search size={13} strokeWidth={2} /></span>
             <input
               type="text"
               placeholder="Search bar ......"
@@ -234,8 +235,8 @@ export default function CommunityTab() {
             Loading community experiences...
           </div>
         ) : posts.length === 0 ? (
-          <div style={{ ...cardStyle, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.4)" }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
+          <div style={{ ...cardStyle, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.4)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ marginBottom: 8 }}><MessageSquare size={36} color="rgba(255,255,255,0.4)" /></div>
             No community posts found matching your search. Be the first to share your experience!
           </div>
         ) : (
@@ -276,7 +277,7 @@ export default function CommunityTab() {
                       <div>
                         <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", margin: 0 }}>{post.authorName}</h3>
                         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>
-                          {dateStr} {post.location ? `• 📍 ${post.location}` : ""}
+                          {dateStr} {post.location ? <><MapPin size={11} strokeWidth={2} style={{ display: "inline", verticalAlign: "middle" }} /> {post.location}</> : ""}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 6 }}>
@@ -335,7 +336,7 @@ export default function CommunityTab() {
                             gap: 6,
                           }}
                         >
-                          <span>{isLiked ? "❤️" : "🤍"}</span> {post.likesCount} Likes
+                          <Heart size={14} fill={isLiked ? "currentColor" : "none"} strokeWidth={2} /> {post.likesCount} Likes
                         </button>
 
                         {/* Comment Button */}
@@ -343,7 +344,7 @@ export default function CommunityTab() {
                           onClick={() => setActiveCommentPostId(isCommentsOpen ? null : post.id)}
                           style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
                         >
-                          <span>💬</span> {post.comments?.length || 0} Comments
+                          <MessageCircle size={14} strokeWidth={2} /> {post.comments?.length || 0} Comments
                         </button>
 
                         {/* Bookmark Button */}
@@ -351,7 +352,8 @@ export default function CommunityTab() {
                           onClick={() => handleToggleBookmark(post.id)}
                           style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", color: isBookmarked ? "#2dd4bf" : "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
                         >
-                          {isBookmarked ? "🔖 Saved" : "🔖 Save"}
+                          <Bookmark size={14} fill={isBookmarked ? "currentColor" : "none"} strokeWidth={2} style={{ display: "inline-block", verticalAlign: "middle", marginRight: 4 }} />
+                          {isBookmarked ? "Saved" : "Save"}
                         </button>
                       </div>
 
@@ -521,7 +523,7 @@ export default function CommunityTab() {
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 8 }}>{selectedDetailPost.title}</h2>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 16 }}>
-              By <strong>{selectedDetailPost.authorName}</strong> {selectedDetailPost.location ? `• 📍 ${selectedDetailPost.location}` : ""}
+              By <strong>{selectedDetailPost.authorName}</strong> {selectedDetailPost.location ? <><MapPin size={12} strokeWidth={2} style={{ display: "inline", verticalAlign: "middle" }} /> {selectedDetailPost.location}</> : ""}
             </div>
             {selectedDetailPost.image && (
               <div style={{ width: "100%", height: 240, borderRadius: 12, backgroundImage: `url(${selectedDetailPost.image})`, backgroundSize: "cover", backgroundPosition: "center", marginBottom: 16 }} />

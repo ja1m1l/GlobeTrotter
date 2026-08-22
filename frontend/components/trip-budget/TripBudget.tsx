@@ -2,6 +2,19 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  BarChart3,
+  CalendarDays,
+  DollarSign,
+  Hotel,
+  Plane,
+  Search,
+  Ticket,
+  Trash2,
+  UtensilsCrossed,
+} from "lucide-react";
 import { tripApi, activityApi, TripData, getUser } from "@/lib/api";
 
 interface ExpenseItem {
@@ -138,17 +151,19 @@ export default function TripBudget() {
       {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}
             onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
             onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
           >
-            ← Dashboard
+            <ArrowLeft size={14} strokeWidth={2} />
+            Dashboard
           </span>
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {tripId && (
-            <button onClick={() => router.push(`/itinerary/${tripId}`)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-              ← Return to Itinerary
+            <button onClick={() => router.push(`/itinerary/${tripId}`)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <ArrowLeft size={14} strokeWidth={2} />
+              Return to Itinerary
             </button>
           )}
           <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
@@ -161,7 +176,7 @@ export default function TripBudget() {
         {/* Wireframe Header Controls Bar */}
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ flex: 1, minWidth: 220, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>🔍</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.4)" }}><Search size={13} strokeWidth={2} /></span>
             <input
               type="text"
               placeholder="Search expenses or activities..."
@@ -195,11 +210,11 @@ export default function TripBudget() {
           </div>
         </div>
 
-        {/* Overbudget Alert Banner (🔴 MUST HAVE) */}
+        {/* Overbudget Alert Banner */}
         {isOverBudget && (
           <div style={{ background: "rgba(239,68,68,0.14)", border: "1.5px solid rgba(239,68,68,0.4)", borderRadius: 16, padding: "16px 20px", color: "#f87171", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span style={{ fontSize: 24 }}>🚨</span>
+              <AlertTriangle size={22} strokeWidth={2} />
               <div>
                 <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f87171", margin: 0 }}>OVER BUDGET ALERT</h3>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", margin: "2px 0 0" }}>
@@ -266,19 +281,20 @@ export default function TripBudget() {
           </div>
         </div>
 
-        {/* Cost Breakdown Cards Grid (🔴 MUST HAVE) */}
+        {/* Cost Breakdown Cards Grid */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 14 }}>
           {[
-            { category: "Transport", label: "🚆 Transport", cost: breakdown.Transport, icon: "✈️", color: "#3b82f6" },
-            { category: "Stay", label: "🏨 Stay / Hotels", cost: breakdown.Stay, icon: "🏨", color: "#a855f7" },
-            { category: "Activities", label: "🎟️ Activities", cost: breakdown.Activities, icon: "🏰", color: "#2dd4bf" },
-            { category: "Meals", label: "🍽️ Meals & Dining", cost: breakdown.Meals, icon: "🍜", color: "#f59e0b" },
+            { category: "Transport", label: "Transport", cost: breakdown.Transport, icon: Plane, color: "#3b82f6" },
+            { category: "Stay", label: "Stay / Hotels", cost: breakdown.Stay, icon: Hotel, color: "#a855f7" },
+            { category: "Activities", label: "Activities", cost: breakdown.Activities, icon: Ticket, color: "#2dd4bf" },
+            { category: "Meals", label: "Meals & Dining", cost: breakdown.Meals, icon: UtensilsCrossed, color: "#f59e0b" },
           ].map((c) => {
             const pct = Math.round((c.cost / totalCost) * 100) || 0;
+            const Icon = c.icon;
             return (
               <div key={c.category} style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.8)" }}>{c.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.8)", display: "inline-flex", alignItems: "center", gap: 6 }}><Icon size={13} strokeWidth={2} /> {c.label}</span>
                   <span style={{ fontSize: 11, fontWeight: 600, color: c.color }}>{pct}%</span>
                 </div>
                 <h3 style={{ fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>${c.cost.toLocaleString()}</h3>
@@ -294,8 +310,8 @@ export default function TripBudget() {
 
         {/* Pie/Bar Distribution Chart Representation */}
         <section style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: 14 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>
-            📊 Budget Distribution & Spending Share
+          <h3 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.9)", display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <BarChart3 size={15} strokeWidth={2} /> Budget Distribution & Spending Share
           </h3>
           <div style={{ width: "100%", height: 16, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", overflow: "hidden" }}>
             <div style={{ width: `${(breakdown.Stay / totalCost) * 100}%`, background: "#a855f7" }} title="Stay" />

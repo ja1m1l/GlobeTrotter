@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearAuth, getUser, authApi, dashboardApi, User, TripData } from "@/lib/api";
+import { Calendar, MessageSquare, BadgeDollarSign, Plane, Landmark, Map } from "lucide-react";
 
 interface Trip {
   id: string;
@@ -158,11 +159,11 @@ export default function LandingPage() {
         {/* left space — GlobeTrotter is in layout fixed header */}
         <div />
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/calendar" style={{ textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600 }}>
-            📅 Calendar View
+          <Link href="/calendar" style={{ textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+            <Calendar size={14} strokeWidth={2} /> Calendar View
           </Link>
-          <Link href="/community" style={{ textDecoration: "none", background: "rgba(45,212,191,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 8, padding: "6px 12px", color: "#2dd4bf", fontSize: 12, fontWeight: 700 }}>
-            💬 Community Tab
+          <Link href="/community" style={{ textDecoration: "none", background: "rgba(45,212,191,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 8, padding: "6px 12px", color: "#2dd4bf", fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+            <MessageSquare size={14} strokeWidth={2} /> Community Tab
           </Link>
           <Link href="/profile" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "inherit" }}>
             {/* User avatar */}
@@ -206,9 +207,9 @@ export default function LandingPage() {
           <SectionTitle>Budget Highlights</SectionTitle>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
             {[
-              { label: "Total Budget", value: "$5,000", sub: "Across 4 planned trips", icon: "💰" },
-              { label: "Total Spent", value: "$3,250", sub: "Completed trips", icon: "✈️" },
-              { label: "Remaining Fund", value: "$1,750", sub: "Available for upcoming", icon: "🏦" },
+              { label: "Total Budget", value: "$5,000", sub: "Across 4 planned trips", icon: <BadgeDollarSign size={24} /> },
+              { label: "Total Spent", value: "$3,250", sub: "Completed trips", icon: <Plane size={24} /> },
+              { label: "Remaining Fund", value: "$1,750", sub: "Available for upcoming", icon: <Landmark size={24} /> },
             ].map((card) => (
               <div key={card.label} style={glassCard}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
@@ -311,8 +312,8 @@ export default function LandingPage() {
           {tripsLoading ? (
             <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Loading trips...</div>
           ) : filteredTrips.length === 0 ? (
-            <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>🗺️</div>
+            <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14, display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <Map size={36} color="rgba(255,255,255,0.4)" style={{ marginBottom: 12 }} />
               No trips match your current filters.
             </div>
           ) : (

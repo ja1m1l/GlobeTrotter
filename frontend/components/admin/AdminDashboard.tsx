@@ -2,6 +2,19 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AlertTriangle,
+  BarChart3,
+  Gauge,
+  Globe2,
+  PieChart,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  Target,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { adminApi, getUser, removeToken, AdminUserItem, AdminAnalyticsData } from "@/lib/api";
 
 export default function AdminDashboard() {
@@ -89,7 +102,7 @@ export default function AdminDashboard() {
     return (
       <div style={{ minHeight: "100vh", background: "#07090c", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
         <div style={{ ...cardStyle, maxWidth: 440, textAlign: "center", padding: 36 }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>⛔</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}><ShieldAlert size={38} strokeWidth={1.8} color="#f87171" /></div>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: "#f87171", margin: 0 }}>403 Access Forbidden</h2>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", margin: "10px 0 20px" }}>
             Admin Dashboard is restricted to system administrators only. Please sign in with an Admin account.
@@ -127,8 +140,9 @@ export default function AdminDashboard() {
           <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
             GlobeTrotter
           </button>
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#f87171", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", padding: "2px 8px", borderRadius: 6 }}>
-            🔒 ADMIN PANEL
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#f87171", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", padding: "2px 8px", borderRadius: 6, display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <ShieldCheck size={12} strokeWidth={2} />
+            ADMIN PANEL
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -145,7 +159,7 @@ export default function AdminDashboard() {
         {/* Top Control Bar (EXACT MATCH FOR WIREFRAME: Search bar ...... | Group by | Filter | Sort by...) */}
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
           <div style={{ flex: 1, minWidth: 220, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>🔍</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.4)" }}><Search size={13} strokeWidth={2} /></span>
             <input
               type="text"
               placeholder="Search bar ......"
@@ -176,11 +190,13 @@ export default function AdminDashboard() {
         {/* Section Navigation Tabs Bar (EXACT MATCH FOR WIREFRAME: Manage Users | Popular cities | Popular Activities | User Trends and Analytics) */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           {[
-            { id: "users", label: "👥 Manage Users" },
-            { id: "cities", label: "🌍 Popular Cities" },
-            { id: "activities", label: "🎯 Popular Activities" },
-            { id: "analytics", label: "📊 User Trends & Analytics" },
-          ].map((tab) => (
+            { id: "users", label: "Manage Users", icon: Users },
+            { id: "cities", label: "Popular Cities", icon: Globe2 },
+            { id: "activities", label: "Popular Activities", icon: Target },
+            { id: "analytics", label: "User Trends & Analytics", icon: BarChart3 },
+          ].map((tab) => {
+            const TabIcon = tab.icon;
+            return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
@@ -195,16 +211,21 @@ export default function AdminDashboard() {
                 cursor: "pointer",
                 fontFamily: "inherit",
                 transition: "all 0.2s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
               }}
             >
+              <TabIcon size={14} strokeWidth={2} />
               {tab.label}
             </button>
-          ))}
+          )})}
         </div>
 
         {/* Central Dark Analytics & Charts Container (MATCHES USER UI SLEEK DARK THEME) */}
         <div style={{ ...cardStyle, padding: "28px 24px", display: "flex", flexDirection: "column", gap: 28 }}>
-          {/* TAB 1: 👥 Manage Users */}
+          {/* TAB 1: Manage Users */}
           {activeTab === "users" && (
             <div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
@@ -271,7 +292,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TAB 2: 🌍 Popular Cities */}
+          {/* TAB 2: Popular Cities */}
           {activeTab === "cities" && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Popular Visited Destinations & Cities</h2>
@@ -293,7 +314,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TAB 3: 🎯 Popular Activities */}
+          {/* TAB 3: Popular Activities */}
           {activeTab === "activities" && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Top Booked & Tagged Activities</h2>
@@ -313,7 +334,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TAB 4: 📊 User Trends & Analytics (MATCHING WIREFRAME CHARTS & GRAPHICS) */}
+          {/* TAB 4: User Trends & Analytics (MATCHING WIREFRAME CHARTS & GRAPHICS) */}
           {(activeTab === "analytics" || activeTab === "users") && (
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               {/* Top Overview KPI Cards */}
@@ -341,7 +362,7 @@ export default function AdminDashboard() {
 
               {/* Wireframe Line Chart: Trips Over Time */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 14 }}>📈 Trips & User Growth Over Time</h3>
+                <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 14, display: "inline-flex", alignItems: "center", gap: 8 }}><TrendingUp size={15} strokeWidth={2} /> Trips & User Growth Over Time</h3>
                 <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 18, padding: "0 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.1)", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
                   {(analytics?.tripTrends || []).map((t) => {
                     const heightPct = Math.min(100, Math.round((t.trips / 2000) * 100));
@@ -367,7 +388,7 @@ export default function AdminDashboard() {
               {/* Wireframe Pie Chart & Region Share */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0 }}>🥧 Destination Region Share</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0, display: "inline-flex", alignItems: "center", gap: 8 }}><PieChart size={15} strokeWidth={2} /> Destination Region Share</h3>
                   <div style={{ width: "100%", height: 16, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", overflow: "hidden" }}>
                     {(analytics?.regionDistribution || []).map((r) => (
                       <div key={r.region} style={{ width: `${r.percentage}%`, background: r.color }} title={r.region} />
@@ -386,7 +407,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 12 }}>⚡ System Performance</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 12, display: "inline-flex", alignItems: "center", gap: 8 }}><Gauge size={15} strokeWidth={2} /> System Performance</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13 }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "rgba(255,255,255,0.5)" }}>Database Latency</span>

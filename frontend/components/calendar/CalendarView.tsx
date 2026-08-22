@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, Plus, Search } from "lucide-react";
 import { tripApi, getUser, TripData } from "@/lib/api";
 
 interface CalendarEvent {
@@ -291,7 +292,7 @@ export default function CalendarView() {
               gap: 6,
             }}
           >
-            ← Dashboard
+            <ArrowLeft size={14} strokeWidth={2} /> Dashboard
           </button>
           <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
             {user?.firstName?.[0]?.toUpperCase() ?? "U"}
@@ -303,7 +304,7 @@ export default function CalendarView() {
         {/* Top Control Bar (EXACT MATCH FOR WIREFRAME: Search bar ...... | Group by | Filter | Sort by...) */}
         <div style={{ ...cardStyle, padding: 16, display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
           <div style={{ flex: 1, minWidth: 220, position: "relative" }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>🔍</span>
+            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.4)" }}><Search size={13} strokeWidth={2} /></span>
             <input
               type="text"
               placeholder="Search bar ......"
@@ -347,18 +348,18 @@ export default function CalendarView() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, padding: "0 10px" }}>
             <button
               onClick={handlePrevMonth}
-              style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, cursor: "pointer", color: "#374151" }}
+              style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151" }}
             >
-              ←
+              <ArrowLeft size={18} strokeWidth={2} />
             </button>
             <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111827", margin: 0 }}>
               {monthName} {year}
             </h2>
             <button
               onClick={handleNextMonth}
-              style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, cursor: "pointer", color: "#374151" }}
+              style={{ background: "none", border: "1px solid #e5e7eb", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#374151" }}
             >
-              →
+              <ArrowRight size={18} strokeWidth={2} />
             </button>
           </div>
 
@@ -400,8 +401,8 @@ export default function CalendarView() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: 4 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{dayNum}</span>
                     {hasConflict && (
-                      <span title="Overlapping activities on date" style={{ fontSize: 10, background: "#fee2e2", color: "#ef4444", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
-                        ⚠️
+                      <span title="Overlapping activities on date" style={{ display: "inline-flex", alignItems: "center", fontSize: 10, background: "#fee2e2", color: "#ef4444", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
+                        <AlertTriangle size={10} strokeWidth={2} />
                       </span>
                     )}
                   </div>
@@ -441,8 +442,8 @@ export default function CalendarView() {
                 <span style={{ fontSize: 11, color: "#2dd4bf", fontWeight: 700, textTransform: "uppercase" }}>
                   Expanded Day Details
                 </span>
-                <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "2px 0 0" }}>
-                  📅 Itinerary for {selectedDateStr}
+                <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "2px 0 0", display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <CalendarDays size={16} strokeWidth={2} /> Itinerary for {selectedDateStr}
                 </h3>
               </div>
               <button
@@ -472,9 +473,9 @@ export default function CalendarView() {
               />
               <button
                 type="submit"
-                style={{ padding: "9px 18px", background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+                style={{ padding: "9px 18px", background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
               >
-                + Add Activity
+                <Plus size={14} strokeWidth={2.5} /> Add Activity
               </button>
             </form>
 

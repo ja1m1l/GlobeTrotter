@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft, DollarSign, Plus, Search, Sparkles, Wand2 } from "lucide-react";
 import { tripApi, TripData, getUser, User } from "@/lib/api";
 
 interface ItinerarySection {
@@ -155,11 +156,11 @@ export default function ItineraryBuilder() {
 
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}
             onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
             onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
           >
-            ← Dashboard
+            <ArrowLeft size={14} strokeWidth={2} /> Dashboard
           </span>
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -183,15 +184,15 @@ export default function ItineraryBuilder() {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button
               onClick={() => router.push(`/trip-budget/${tripId}`)}
-              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "10px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "10px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
-              💰 Trip Budget
+              <DollarSign size={14} strokeWidth={2} /> Trip Budget
             </button>
             <button
               onClick={() => router.push(`/activity-search?tripId=${tripId}`)}
-              style={{ background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(20,184,166,0.3)" }}
+              style={{ background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(20,184,166,0.3)", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
-              🔍 Search Activities
+              <Search size={14} strokeWidth={2} /> Search Activities
             </button>
             <button
               onClick={handleRegenerateItinerary}
@@ -208,12 +209,15 @@ export default function ItineraryBuilder() {
                 fontFamily: "inherit",
                 boxShadow: "0 4px 16px rgba(139,92,246,0.3)",
                 opacity: regenerating ? 0.7 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
               }}
             >
-              {regenerating ? "🔄 Regenerating..." : "✨ AI Regenerate Itinerary"}
+              {regenerating ? <><Sparkles size={14} strokeWidth={2} /> Regenerating...</> : <><Wand2 size={14} strokeWidth={2} /> AI Regenerate Itinerary</>}
             </button>
-            <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-              ← Trip Form
+            <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <ArrowLeft size={14} strokeWidth={2} /> Trip Form
             </button>
           </div>
         </div>
@@ -284,7 +288,7 @@ export default function ItineraryBuilder() {
               e.currentTarget.style.background = "rgba(255,255,255,0.04)";
             }}
           >
-            <span style={{ fontSize: 20, lineHeight: 1, color: "#2dd4bf" }}>+</span>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#2dd4bf" }}><Plus size={18} strokeWidth={2.5} /></span>
             Add another Section
           </button>
         </div>
