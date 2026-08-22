@@ -35,11 +35,12 @@ export default function RootLayout({
         <div
           style={{
             position: "fixed",
-            top: 24,
+            top: 20,
             left: 28,
             zIndex: 100,
             display: "flex",
             alignItems: "center",
+            height: 20, // matching header content height
           }}
         >
           <span
@@ -49,6 +50,7 @@ export default function RootLayout({
               fontWeight: 800,
               color: "#fff",
               letterSpacing: "-0.01em",
+              lineHeight: "20px",
               userSelect: "none",
             }}
           >

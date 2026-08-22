@@ -117,9 +117,14 @@ export default function TripsPage() {
 
       {/* Header */}
       <header style={headerStyle}>
-        <Link href="/" style={{ textDecoration: "none", color: "#fff", display: "flex", alignItems: "center" }}>
+        <Link href="/" style={{ textDecoration: "none", color: "#fff", display: "flex", alignItems: "center", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20 }}>
           {/* Logo empty space — handles text in layout */}
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>← Dashboard</span>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={userAvatarStyle}>
