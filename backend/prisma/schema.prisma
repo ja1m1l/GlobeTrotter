@@ -26,6 +26,51 @@ model User {
   additionalInfo       String?
   resetPasswordToken   String?   @unique
   resetPasswordExpires DateTime?
+  trips                Trip[]
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
+}
+
+model City {
+  id        String     @id @default(uuid())
+  name      String
+  country   String
+  region    String
+  image     String?
+  tripStops TripStop[]
+
+  @@index([country])
+  @@index([region])
+  @@index([name])
+}
+
+model Trip {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  coverImage  String?
+  tripStops   TripStop[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([userId, startDate])
+  @@index([userId, createdAt])
+}
+
+model TripStop {
+  id        String   @id @default(uuid())
+  tripId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  cityId    String
+  city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tripId])
+  @@index([cityId])
 }
