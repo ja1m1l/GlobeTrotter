@@ -175,6 +175,28 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Budget Highlights */}
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold text-gray-800">Budget Highlights</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-gray-500">Total Budget Allocated</span>
+              <span className="text-2xl font-bold text-gray-900 mt-1">$5,000</span>
+              <span className="text-[11px] text-gray-400 mt-1">Across 4 planned trips</span>
+            </div>
+            <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-gray-500">Total Spent</span>
+              <span className="text-2xl font-bold text-gray-900 mt-1">$3,250</span>
+              <span className="text-[11px] text-gray-500 mt-1">Completed trips</span>
+            </div>
+            <div className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col justify-between">
+              <span className="text-xs font-medium text-gray-500">Remaining Travel Fund</span>
+              <span className="text-2xl font-bold text-gray-900 mt-1">$1,750</span>
+              <span className="text-[11px] text-gray-500 mt-1">Available for upcoming trips</span>
+            </div>
+          </div>
+        </section>
+
         {/* Top Regional Selections */}
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
