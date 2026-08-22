@@ -5,9 +5,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { isAuthenticated, clearAuth, getUser, dashboardApi, tripApi, TripData, User } from "@/lib/api";
 
-const REGION_EMOJIS: Record<string, string> = {
-  Europe: "🏰", Asia: "⛩️", Americas: "🗽", Africa: "🦁", Oceania: "🐨",
+const REGION_IMAGES: Record<string, string> = {
+  Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
+  Asia: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&auto=format&fit=crop",
+  Americas: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=400&auto=format&fit=crop",
+  Africa: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400&auto=format&fit=crop",
+  Oceania: "https://images.unsplash.com/photo-1524820197278-540916411e20?w=400&auto=format&fit=crop",
 };
+
+const DEFAULT_TRAVEL_IMG = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop";
 
 const REGIONS = ["Europe", "Asia", "Americas", "Africa", "Oceania"];
 
@@ -327,14 +333,27 @@ function EmptyState({ text }: { text: string }) {
 function TripRowCard({ trip, onDelete }: { trip: TripData; onDelete: (e: React.MouseEvent) => void }) {
   const start = new Date(trip.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const end = new Date(trip.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  
+  // Choose cover image: explicit coverImage -> matching region image -> default cover
+  const regionName = trip.description?.includes("Paris") || trip.name?.includes("Paris") ? "Europe" :
+                     trip.description?.includes("Tokyo") || trip.name?.includes("Tokyo") ? "Asia" :
+                     trip.description?.includes("NY") || trip.name?.includes("New York") ? "Americas" : "Europe";
+  const bgImg = trip.coverImage || REGION_IMAGES[regionName] || DEFAULT_TRAVEL_IMG;
+
   return (
-    <div style={{ ...glassCard, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-      <div>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{trip.name}</h3>
-        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 2 }}>{trip.description || "No description provided"}</p>
+    <div style={{ ...glassCard, display: "flex", alignItems: "center", gap: 16, padding: "14px 20px" }}>
+      <div style={{
+        width: 54, height: 54, borderRadius: 10,
+        backgroundImage: `url(${bgImg})`, backgroundSize: "cover",
+        backgroundPosition: "center", flexShrink: 0,
+        border: "1px solid rgba(255,255,255,0.06)"
+      }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.name}</h3>
+        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginBottom: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.description || "No description provided"}</p>
         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>📅 {start} — {end}</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
         <span style={badgeStyle(trip.status || "upcoming")}>{trip.status || "upcoming"}</span>
         <button onClick={onDelete} style={deleteButtonStyle}>
           🗑️

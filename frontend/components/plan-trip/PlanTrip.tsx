@@ -9,42 +9,42 @@ const SUGGESTIONS = [
     id: "s1",
     title: "Eiffel Tower & Seine Cruise",
     location: "Paris, France",
-    image: "🏰",
+    image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400",
     description: "Explore iconic landmarks and romantic river cruises.",
   },
   {
     id: "s2",
     title: "Tokyo Ramen & Temple Tour",
     location: "Tokyo, Japan",
-    image: "⛩️",
+    image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400",
     description: "Immerse in Japanese culture and legendary street food.",
   },
   {
     id: "s3",
     title: "Colosseum & Roman Forum",
     location: "Rome, Italy",
-    image: "🏛️",
+    image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400",
     description: "Walk through ancient history and authentic trattorias.",
   },
   {
     id: "s4",
     title: "Swiss Alps Hiking Trail",
     location: "Zurich, Switzerland",
-    image: "🏔️",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400",
     description: "Breathtaking mountain peaks and Alpine lake views.",
   },
   {
     id: "s5",
     title: "Bali Beach & Temple Retreat",
     location: "Bali, Indonesia",
-    image: "🏝️",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400",
     description: "Tropical beaches, rice terraces, and serene retreats.",
   },
   {
     id: "s6",
     title: "New York Skyline & Broadway",
     location: "New York, USA",
-    image: "🗽",
+    image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400",
     description: "The vibrant heartbeat of Central Park and Broadway shows.",
   },
 ];
@@ -125,13 +125,19 @@ export default function PlanTrip() {
       {/* Background Orbs */}
       <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%)", top: "-15%", right: "-10%", pointerEvents: "none", zIndex: 0 }} />
 
-      {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-          GlobeTrotter
+        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </button>
-        <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
-          {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
+            {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+          </div>
         </div>
       </header>
 
@@ -289,7 +295,16 @@ export default function PlanTrip() {
                     transition: "all 0.2s",
                   }}
                 >
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>{s.image}</div>
+                  <div style={{
+                    height: 100,
+                    width: "100%",
+                    borderRadius: 10,
+                    backgroundImage: `url(${s.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    marginBottom: 12,
+                    border: "1px solid rgba(255,255,255,0.06)"
+                  }} />
                   <h3 style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{s.title}</h3>
                   <span style={{ fontSize: 11, color: "#2dd4bf", fontWeight: 600, display: "block", marginBottom: 6 }}>{s.location}</span>
                   <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{s.description}</p>

@@ -12,11 +12,18 @@ interface Trip {
   location: string;
   date: string;
   status: "Completed" | "Upcoming" | "Draft";
+  coverImage?: string;
 }
 
-const REGION_EMOJIS: Record<string, string> = {
-  Europe: "🏰", Asia: "⛩️", Americas: "🗽", Africa: "🦁", Oceania: "🐨",
+const REGION_IMAGES: Record<string, string> = {
+  Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
+  Asia: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&auto=format&fit=crop",
+  Americas: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=400&auto=format&fit=crop",
+  Africa: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400&auto=format&fit=crop",
+  Oceania: "https://images.unsplash.com/photo-1524820197278-540916411e20?w=400&auto=format&fit=crop",
 };
+
+const DEFAULT_TRAVEL_IMG = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop";
 
 const REGIONS = [
   { id: "europe", name: "Europe", count: 12 },
@@ -27,10 +34,10 @@ const REGIONS = [
 ];
 
 const INITIAL_TRIPS: Trip[] = [
-  { id: "1", title: "Summer in Paris", region: "Europe", location: "France", date: "July 2024", status: "Completed" },
-  { id: "2", title: "Tokyo Culinary Odyssey", region: "Asia", location: "Japan", date: "October 2024", status: "Completed" },
-  { id: "3", title: "Patagonia Expedition", region: "Americas", location: "Chile & Argentina", date: "March 2025", status: "Upcoming" },
-  { id: "4", title: "Safari & Victoria Falls", region: "Africa", location: "Zimbabwe", date: "December 2025", status: "Draft" },
+  { id: "1", title: "Summer in Paris", region: "Europe", location: "France", date: "July 2024", status: "Completed", coverImage: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400" },
+  { id: "2", title: "Tokyo Culinary Odyssey", region: "Asia", location: "Japan", date: "October 2024", status: "Completed", coverImage: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400" },
+  { id: "3", title: "Patagonia Expedition", region: "Americas", location: "Chile & Argentina", date: "March 2025", status: "Upcoming", coverImage: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400" },
+  { id: "4", title: "Safari & Victoria Falls", region: "Africa", location: "Zimbabwe", date: "December 2025", status: "Draft", coverImage: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400" },
 ];
 
 const STATUS_STYLE: Record<string, { color: string; bg: string; border: string }> = {
@@ -180,13 +187,32 @@ export default function LandingPage() {
               const active = selectedRegion === r.name;
               return (
                 <button key={r.id} onClick={() => setSelectedRegion(active ? null : r.name)}
-                  style={{ background: active ? "rgba(45,212,191,0.12)" : "rgba(255,255,255,0.03)", border: `1.5px solid ${active ? "rgba(45,212,191,0.5)" : "rgba(255,255,255,0.07)"}`, borderRadius: 14, padding: "16px 12px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, transition: "all 0.2s", fontFamily: "inherit" }}
+                  style={{
+                    position: "relative",
+                    height: 100,
+                    backgroundImage: `url(${REGION_IMAGES[r.name]})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    border: `1.5px solid ${active ? "#2dd4bf" : "rgba(255,255,255,0.08)"}`,
+                    borderRadius: 14,
+                    cursor: "pointer",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-end",
+                    padding: "12px",
+                    transition: "all 0.2s",
+                    fontFamily: "inherit"
+                  }}
                   onMouseEnter={(e) => { if (!active) e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
                   onMouseLeave={(e) => { if (!active) e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
                 >
-                  <span style={{ fontSize: 24 }}>{REGION_EMOJIS[r.name]}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: active ? "#2dd4bf" : "rgba(255,255,255,0.7)" }}>{r.name}</span>
-                  <span style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{r.count} trips</span>
+                  {/* Overlay to ensure text readability */}
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)", zIndex: 1 }} />
+                  <div style={{ position: "relative", zIndex: 2, textAlign: "left", width: "100%" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", display: "block" }}>{r.name}</span>
+                    <span style={{ fontSize: 10, color: active ? "#2dd4bf" : "rgba(255,255,255,0.4)" }}>{r.count} trips</span>
+                  </div>
                 </button>
               );
             })}
@@ -246,10 +272,14 @@ export default function LandingPage() {
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(45,212,191,0.25)"; e.currentTarget.style.transform = "translateY(-3px)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}
                   >
-                    {/* Image placeholder */}
-                    <div style={{ height: 130, background: "linear-gradient(135deg,rgba(20,184,166,0.08) 0%,rgba(13,148,136,0.12) 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36 }}>
-                      {REGION_EMOJIS[trip.region] ?? "🌍"}
-                    </div>
+                    {/* Cover image or fallback */}
+                    <div style={{
+                      height: 130,
+                      backgroundImage: `url(${trip.coverImage || REGION_IMAGES[trip.region] || DEFAULT_TRAVEL_IMG})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      width: "100%"
+                    }} />
                     <div style={{ padding: "14px 16px" }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{trip.region}</span>

@@ -5,9 +5,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User } from "@/lib/api";
 
-const REGION_EMOJIS: Record<string, string> = {
-  Europe: "🏰", Asia: "⛩️", Americas: "🗽", Africa: "🦁", Oceania: "🐨",
+const REGION_IMAGES: Record<string, string> = {
+  Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
+  Asia: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&auto=format&fit=crop",
+  Americas: "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=400&auto=format&fit=crop",
+  Africa: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400&auto=format&fit=crop",
+  Oceania: "https://images.unsplash.com/photo-1524820197278-540916411e20?w=400&auto=format&fit=crop",
 };
+
+const DEFAULT_TRAVEL_IMG = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -299,14 +305,25 @@ function EmptyTripsState() {
 
 function TripScrollCard({ trip }: { trip: TripData }) {
   const start = new Date(trip.startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  
+  // Decide image
+  const regionName = trip.description?.includes("Paris") || trip.name?.includes("Paris") ? "Europe" :
+                     trip.description?.includes("Tokyo") || trip.name?.includes("Tokyo") ? "Asia" :
+                     trip.description?.includes("NY") || trip.name?.includes("New York") ? "Americas" : "Europe";
+  const bgImg = trip.coverImage || REGION_IMAGES[regionName] || DEFAULT_TRAVEL_IMG;
+
   return (
     <div style={scrollCardStyle}>
-      <div style={scrollCardImgStyle}>
-        {REGION_EMOJIS[trip.description || ""] || "✈️"}
-      </div>
+      <div style={{
+        ...scrollCardImgStyle,
+        backgroundImage: `url(${bgImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        border: "1px solid rgba(255,255,255,0.06)"
+      }} />
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.name}</h4>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{trip.description}</span>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{trip.description}</span>
         <span style={{ fontSize: 10, color: "rgba(255,255,255,0.25)" }}>{start}</span>
       </div>
       <Link href="/trips" style={scrollCardLinkStyle}>
