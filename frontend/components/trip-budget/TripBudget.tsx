@@ -318,7 +318,7 @@ export default function TripBudget() {
               Itinerary for a selected place
             </h2>
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
-              Daily Physical Activity Timeline & Expense Log (Screen 9)
+              Daily Physical Activity Timeline & Expense Log
             </p>
           </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { communityApi, CommunityPostItem, getUser, getGlobalCountriesAndCities } from "@/lib/api";
+import { communityApi, CommunityPostItem, getUser, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
 
 const REGIONS = [
   { id: "all", label: "All Regions" },
@@ -55,6 +55,8 @@ export default function CommunityTab() {
   const [newRegion, setNewRegion] = useState("Europe");
   const [newCategory, setNewCategory] = useState("Travel Story");
   const [newImage, setNewImage] = useState("");
+  const newImageFileRef = useRef<HTMLInputElement>(null);
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [publishing, setPublishing] = useState(false);
 
   // Detailed Modal View
@@ -124,13 +126,16 @@ export default function CommunityTab() {
 
     setPublishing(true);
     try {
+      const uploadedImage = newImageFile
+        ? await uploadProfileImage(newImageFile)
+        : newImage.trim() || undefined;
       const res = await communityApi.createPost({
         title: newTitle.trim(),
         content: newContent.trim(),
         location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : 'Global',
         region: newRegion,
         category: newCategory,
-        image: newImage.trim() || undefined,
+        image: uploadedImage,
       });
 
       setPosts([res.post, ...posts]);
@@ -139,6 +144,8 @@ export default function CommunityTab() {
       setSelectedCity("");
       setNewContent("");
       setNewImage("");
+      setNewImageFile(null);
+      if (newImageFileRef.current) newImageFileRef.current.value = "";
       setIsShareModalOpen(false);
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : "Failed to publish post.");
@@ -472,8 +479,19 @@ export default function CommunityTab() {
               </div>
 
               <div>
-                <label style={labelStyle}>Image URL (Optional)</label>
-                <input type="url" placeholder="https://images.unsplash.com/..." value={newImage} onChange={(e) => setNewImage(e.target.value)} style={inputStyle} />
+                <label style={labelStyle}>Experience Image (Optional)</label>
+                <input
+                  ref={newImageFileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    setNewImageFile(file);
+                    if (file) setNewImage("");
+                  }}
+                  style={{ ...inputStyle, padding: 9, marginBottom: 8 }}
+                />
+                <input type="url" placeholder="Or paste an image URL" value={newImage} onChange={(e) => setNewImage(e.target.value)} style={inputStyle} />
               </div>
 
               <div>

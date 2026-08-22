@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, tripApi, City, getGlobalCountriesAndCities } from "@/lib/api";
+import { getUser, tripApi, City, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
 
 const SUGGESTIONS = [
   {
@@ -115,12 +115,15 @@ export default function PlanTrip() {
 
     setLoading(true);
     try {
+      const uploadedCoverImage = coverImageFile
+        ? await uploadProfileImage(coverImageFile)
+        : coverImage.trim() || undefined;
       const res = await tripApi.createTrip({
         name: name.trim(),
         startDate,
         endDate,
         description: description.trim() || undefined,
-        coverImage: coverImage.trim() || undefined,
+        coverImage: uploadedCoverImage,
         location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : undefined,
         maxBudget: maxBudget ? parseFloat(maxBudget) : undefined,
       });
@@ -268,10 +271,21 @@ export default function PlanTrip() {
 
           {/* Optional: Cover Photo URL */}
           <div>
-            <label style={labelStyle}>Cover Photo URL (Optional)</label>
+            <label style={labelStyle}>Cover Photo (Optional)</label>
+            <input
+              ref={coverImageFileRef}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setCoverImageFile(file);
+                if (file) setCoverImage("");
+              }}
+              style={{ ...inputStyle, padding: 9, marginBottom: 8 }}
+            />
             <input
               type="url"
-              placeholder="https://images.unsplash.com/photo-..."
+              placeholder="Or paste an image URL"
               value={coverImage}
               onChange={(e) => setCoverImage(e.target.value)}
               style={inputStyle}

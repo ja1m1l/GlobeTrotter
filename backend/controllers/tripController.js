@@ -279,7 +279,7 @@ exports.createTrip = async (req, res) => {
       }
     }
 
-    if (matchingCity && matchingCity.image) {
+    if (matchingCity && matchingCity.image && !resolvedCoverImage) {
       resolvedCoverImage = matchingCity.image;
     } else if (destination && !resolvedCoverImage) {
       const kw = destination.toLowerCase();
@@ -415,12 +415,6 @@ exports.getTripById = async (req, res) => {
             city: true,
           },
           orderBy: { createdAt: 'asc' },
-        },
-        tripActivities: {
-          include: {
-            activity: true,
-          },
-          orderBy: { createdAt: 'desc' },
         },
       },
     });

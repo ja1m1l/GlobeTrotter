@@ -4,6 +4,43 @@
  */
 
 const BASE_URL = "";
+const S3_URL = process.env.NEXT_PUBLIC_S3_URL;
+const S3_JWT = process.env.NEXT_PUBLIC_S3_JWT;
+
+export async function uploadProfileImage(file: File): Promise<string> {
+  if (!S3_URL || !S3_JWT) {
+    throw new Error("Profile image upload is not configured.");
+  }
+
+  const imageBase64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const [, base64] = result.split(",");
+      if (!base64) reject(new Error("Could not read the profile image."));
+      else resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Could not read the profile image."));
+    reader.readAsDataURL(file);
+  });
+
+  const response = await fetch(S3_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${S3_JWT}`,
+    },
+    body: JSON.stringify({ contentType: file.type, imageBase64 }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || result.message || "Profile image upload failed.");
+  }
+
+  const imageUrl = result.imageUrl || result.url || result.data?.imageUrl || result.data?.url;
+  if (!imageUrl) throw new Error("Profile image upload did not return an image URL.");
+  return imageUrl;
+}
 
 // ── Token helpers ──────────────────────────────────
 export const getToken = (): string | null =>
@@ -35,6 +72,8 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  role?: "USER" | "ADMIN" | string;
+  status?: "Active" | "Disabled" | string;
   photoUrl?: string | null;
   firstName: string;
   lastName: string;
@@ -97,7 +136,8 @@ async function apiFetch<T>(
 
 // ── Auth API ───────────────────────────────────────
 export interface LoginPayload {
-  username: string;
+  username?: string;
+  email?: string;
   password: string;
 }
 
@@ -477,6 +517,64 @@ export const communityApi = {
       body: JSON.stringify({ content }),
     }),
 };
+
+// ── Admin API (Screen 12) ─────────────────────────
+export interface AdminUserItem {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "USER" | "ADMIN" | string;
+  status: "Active" | "Disabled" | string;
+  createdAt: string;
+  _count?: {
+    trips: number;
+    communityPosts: number;
+  };
+}
+
+export interface AdminAnalyticsData {
+  totalUsers: number;
+  activeUsers: number;
+  totalTrips: number;
+  totalActivities: number;
+  totalCommunityPosts: number;
+  popularCities: Array<{ id: string; name: string; tripsCount: number }>;
+  popularActivities: Array<{ name: string; category: string; count: number }>;
+  tripTrends: Array<{ month: string; trips: number; users: number }>;
+  regionDistribution: Array<{ region: string; percentage: number; color: string }>;
+}
+
+export const adminApi = {
+  getAnalytics: () =>
+    apiFetch<{ analytics: AdminAnalyticsData }>("/api/admin/analytics"),
+
+  getUsers: (params?: { search?: string; status?: string }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ users: AdminUserItem[] }>(`/api/admin/users${qStr ? `?${qStr}` : ""}`);
+  },
+
+  toggleUserStatus: (id: string, status: string) =>
+    apiFetch<{ message: string; user: AdminUserItem }>(`/api/admin/users/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+
+  deleteUser: (id: string) =>
+    apiFetch<{ message: string }>(`/api/admin/users/${id}`, {
+      method: "DELETE",
+    }),
+};
+
 
 
 

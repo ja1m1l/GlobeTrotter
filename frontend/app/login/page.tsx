@@ -18,10 +18,16 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await authApi.login({ username: identifier, password });
+      const res = await authApi.login({ username: identifier, email: identifier, password });
       setToken(res.token);
       setUser(res.user);
-      router.push("/");
+
+      // Unified single login page role check:
+      if (res.user.role === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed.");
     } finally {

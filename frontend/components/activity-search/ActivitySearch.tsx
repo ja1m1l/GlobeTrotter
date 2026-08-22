@@ -164,7 +164,7 @@ export default function ActivitySearch() {
         {/* Title Header (Matching Wireframe) */}
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 4 }}>
-            Activity Search Pages / City Search Page
+            Activity & Destination Search
           </h1>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
             Explore, filter and add top-rated activities to your trip itinerary
