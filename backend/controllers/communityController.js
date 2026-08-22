@@ -175,3 +175,36 @@ exports.addComment = async (req, res) => {
     return res.status(500).json({ error: 'Failed to add comment.' });
   }
 };
+
+/**
+ * DELETE /api/community/:id
+ * Delete a post by ID (Author or Admin)
+ */
+exports.deletePost = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { id } = req.params;
+
+    const post = await prisma.communityPost.findUnique({ where: { id } });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found.' });
+    }
+
+    // Verify ownership or Admin role
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (post.userId && post.userId !== userId && user?.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Not authorized to delete this post.' });
+    }
+
+    // Delete post comments first
+    await prisma.postComment.deleteMany({ where: { postId: id } });
+
+    // Delete post
+    await prisma.communityPost.delete({ where: { id } });
+
+    return res.json({ message: 'Post deleted successfully', id });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    return res.status(500).json({ error: 'Failed to delete post.' });
+  }
+};

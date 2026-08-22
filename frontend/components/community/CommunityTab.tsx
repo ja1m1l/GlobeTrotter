@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { communityApi, CommunityPostItem, getUser, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
+import { communityApi, CommunityPostItem, getUser, User, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
 
 const REGIONS = [
   { id: "all", label: "All Regions" },
@@ -27,7 +27,7 @@ const SORT_OPTIONS = [
 
 export default function CommunityTab() {
   const router = useRouter();
-  const [user, setUser] = useState<{ firstName?: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const [posts, setPosts] = useState<CommunityPostItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,8 +102,21 @@ export default function CommunityTab() {
     }
   };
 
-  const handleToggleBookmark = (id: string) => {
-    setBookmarkedPosts((prev) => ({ ...prev, [id]: !prev[id] }));
+  const handleToggleBookmark = (postId: string) => {
+    setBookmarkedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm("Are you sure you want to delete this community post?")) return;
+    try {
+      await communityApi.deletePost(postId);
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Failed to delete post.");
+    }
   };
 
   const handleAddComment = async (postId: string) => {
@@ -279,7 +292,7 @@ export default function CommunityTab() {
                           {dateStr} {post.location ? `• 📍 ${post.location}` : ""}
                         </span>
                       </div>
-                      <div style={{ display: "flex", gap: 6 }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                         {post.category && (
                           <span style={{ fontSize: 11, fontWeight: 700, color: "#2dd4bf", background: "rgba(45,212,191,0.1)", padding: "3px 9px", borderRadius: 99 }}>
                             {post.category}
@@ -289,6 +302,25 @@ export default function CommunityTab() {
                           <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.05)", padding: "3px 9px", borderRadius: 99 }}>
                             {post.region}
                           </span>
+                        )}
+                        {(user?.id === post.userId || user?.role === "ADMIN" || (user?.firstName && post.authorName.toLowerCase().includes(user.firstName.toLowerCase()))) && (
+                          <button
+                            onClick={() => handleDeletePost(post.id)}
+                            style={{
+                              background: "rgba(239,68,68,0.15)",
+                              border: "1px solid rgba(239,68,68,0.3)",
+                              borderRadius: 8,
+                              padding: "4px 10px",
+                              color: "#f87171",
+                              fontSize: 11,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              marginLeft: 4,
+                            }}
+                            title="Delete this community post"
+                          >
+                            🗑️ Delete
+                          </button>
                         )}
                       </div>
                     </div>
