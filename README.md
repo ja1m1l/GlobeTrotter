@@ -142,4 +142,3 @@ GlobeTrotter/
 - **Next.js Proxy:** Cross-origin API calls are seamlessly managed through Next.js rewrite configurations in development.
 
 ---
-*Built by ja1m1l.*
