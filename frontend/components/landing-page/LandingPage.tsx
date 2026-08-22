@@ -114,9 +114,6 @@ export default function LandingPage() {
         {/* left space — GlobeTrotter is in layout fixed header */}
         <div />
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/admin/login" style={{ textDecoration: "none", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "6px 12px", color: "#f87171", fontSize: 12, fontWeight: 700 }}>
-            🔒 Admin Portal
-          </Link>
           <Link href="/calendar" style={{ textDecoration: "none", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: 600 }}>
             📅 Calendar View
           </Link>
