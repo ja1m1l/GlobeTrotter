@@ -9,7 +9,6 @@ import {
   PieChart,
   Search,
   ShieldAlert,
-  ShieldCheck,
   Target,
   TrendingUp,
   Users,
@@ -135,15 +134,8 @@ export default function AdminDashboard() {
 
       {/* Header Bar */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-            GlobeTrotter
-          </button>
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#f87171", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", padding: "2px 8px", borderRadius: 6, display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <ShieldCheck size={12} strokeWidth={2} />
-            ADMIN PANEL
-          </span>
-        </div>
+        {/* left space — GlobeTrotter is rendered by root layout */}
+        <div style={{ width: 140 }} />
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
             Admin: <strong style={{ color: "#fff" }}>{currentUser?.firstName ?? "System"}</strong>
@@ -364,29 +356,72 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Wireframe Line Chart: Trips Over Time */}
+              {/* Wireframe Line/Bar Chart: Trips & User Growth Over Time */}
               <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 14, display: "inline-flex", alignItems: "center", gap: 8 }}><TrendingUp size={15} strokeWidth={2} /> Trips & User Growth Over Time</h3>
-                <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 18, padding: "0 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.1)", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
-                  {(analytics?.tripTrends || []).map((t) => {
-                    const heightPct = Math.min(100, Math.round((t.trips / 2000) * 100));
-                    return (
-                      <div key={t.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, height: "100%", justifyContent: "flex-end" }}>
-                        <div
-                          style={{
-                            width: "75%",
-                            height: `${heightPct}%`,
-                            background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 100%)",
-                            borderRadius: "6px 6px 0 0",
-                            transition: "height 0.4s ease",
-                          }}
-                          title={`${t.trips} trips`}
-                        />
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)" }}>{t.month}</span>
-                      </div>
-                    );
-                  })}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0, display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <TrendingUp size={15} strokeWidth={2} /> Trips & User Growth Over Time
+                  </h3>
+                  <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 12, fontWeight: 600 }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
+                      <span style={{ width: 10, height: 10, borderRadius: 2, background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 100%)" }} /> Trips Created
+                    </span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(255,255,255,0.7)" }}>
+                      <span style={{ width: 10, height: 10, borderRadius: 2, background: "linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)" }} /> Registered Users
+                    </span>
+                  </div>
                 </div>
+
+                {(() => {
+                  const trends = analytics?.tripTrends || [];
+                  const maxVal = Math.max(...trends.map((t) => Math.max(t.trips || 0, t.users || 0)), 1);
+
+                  return (
+                    <div style={{ height: 200, display: "flex", alignItems: "flex-end", gap: 12, padding: "20px 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.1)", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
+                      {trends.map((t) => {
+                        const tripPct = t.trips > 0 ? Math.max(20, Math.round((t.trips / maxVal) * 100)) : 0;
+                        const userPct = t.users > 0 ? Math.max(20, Math.round((t.users / maxVal) * 100)) : 0;
+
+                        return (
+                          <div key={t.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, height: "100%", justifyContent: "flex-end" }}>
+                            <div style={{ display: "flex", alignItems: "flex-end", gap: 4, width: "100%", justifyContent: "center", height: "100%" }}>
+                              {/* Trips Bar */}
+                              <div style={{ flex: 1, maxWidth: 24, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center" }}>
+                                {t.trips > 0 && <span style={{ fontSize: 10, fontWeight: 800, color: "#2dd4bf", marginBottom: 2 }}>{t.trips}</span>}
+                                <div
+                                  style={{
+                                    width: "100%",
+                                    height: `${tripPct}%`,
+                                    background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 100%)",
+                                    borderRadius: "4px 4px 0 0",
+                                    transition: "height 0.4s ease",
+                                  }}
+                                  title={`${t.trips} Trips in ${t.month}`}
+                                />
+                              </div>
+
+                              {/* Users Bar */}
+                              <div style={{ flex: 1, maxWidth: 24, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center" }}>
+                                {t.users > 0 && <span style={{ fontSize: 10, fontWeight: 800, color: "#60a5fa", marginBottom: 2 }}>{t.users}</span>}
+                                <div
+                                  style={{
+                                    width: "100%",
+                                    height: `${userPct}%`,
+                                    background: "linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)",
+                                    borderRadius: "4px 4px 0 0",
+                                    transition: "height 0.4s ease",
+                                  }}
+                                  title={`${t.users} Users registered in ${t.month}`}
+                                />
+                              </div>
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)", marginTop: 4 }}>{t.month}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Wireframe Pie Chart & Region Share */}
