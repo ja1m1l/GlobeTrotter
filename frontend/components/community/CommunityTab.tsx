@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MessageSquare, MapPin, Heart, MessageCircle, Bookmark } from "lucide-react";
+import { Search, MessageSquare, MapPin, Heart, MessageCircle, Bookmark, Share2 } from "lucide-react";
 import { communityApi, CommunityPostItem, getUser, User, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
 
 const REGIONS = [
@@ -386,6 +386,18 @@ export default function CommunityTab() {
                         >
                           <Bookmark size={14} fill={isBookmarked ? "currentColor" : "none"} strokeWidth={2} style={{ display: "inline-block", verticalAlign: "middle", marginRight: 4 }} />
                           {isBookmarked ? "Saved" : "Save"}
+                        </button>
+
+                        {/* Share Button */}
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/community?postId=${post.id}`);
+                            alert("Post link copied!");
+                          }}
+                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.6)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                        >
+                          <Share2 size={14} strokeWidth={2} style={{ display: "inline-block", verticalAlign: "middle", marginRight: 4 }} />
+                          Share
                         </button>
                       </div>
 

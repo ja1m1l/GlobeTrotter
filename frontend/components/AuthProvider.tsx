@@ -8,7 +8,10 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/forgot-password",
-  "/reset-password"
+  "/reset-password",
+  "/itinerary",
+  "/trip-budget",
+  "/community"
 ];
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {

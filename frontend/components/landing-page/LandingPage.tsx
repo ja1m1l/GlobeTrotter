@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearAuth, getUser, authApi, dashboardApi, User, TripData } from "@/lib/api";
-import { Calendar, MessageSquare, BadgeDollarSign, Plane, Landmark, Map } from "lucide-react";
+import { Calendar, MessageSquare, BadgeDollarSign, Plane, Landmark, Map, Share2 } from "lucide-react";
 
 interface Trip {
   id: string;
@@ -337,9 +337,21 @@ export default function LandingPage() {
                     <div style={{ padding: "14px 16px" }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{trip.region}</span>
-                        <span style={{ fontSize: 10, fontWeight: 600, color: s.color, background: s.bg, border: `1px solid ${s.border}`, borderRadius: 99, padding: "2px 8px" }}>
-                          {trip.status}
-                        </span>
+                        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard.writeText(`${window.location.origin}/itinerary/${trip.id}`);
+                              alert("Public itinerary link copied!");
+                            }}
+                            style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 6, padding: "4px 8px", color: "#fff", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+                          >
+                            <Share2 size={12} /> Share
+                          </button>
+                          <span style={{ fontSize: 10, fontWeight: 600, color: s.color, background: s.bg, border: `1px solid ${s.border}`, borderRadius: 99, padding: "2px 8px" }}>
+                            {trip.status}
+                          </span>
+                        </div>
                       </div>
                       <h3 style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{trip.title}</h3>
                       <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{trip.location} · {trip.date}</p>

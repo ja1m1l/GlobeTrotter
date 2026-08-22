@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertTriangle, ArrowLeft, CalendarDays, Plus, Search, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, CalendarDays, Plus, Search, Trash2, Share2 } from "lucide-react";
 import { isAuthenticated, clearAuth, getUser, dashboardApi, tripApi, TripData, User } from "@/lib/api";
 
 const REGION_IMAGES: Record<string, string> = {
@@ -355,6 +355,16 @@ function TripRowCard({ trip, onDelete }: { trip: TripData; onDelete: (e: React.M
         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", display: "inline-flex", alignItems: "center", gap: 4 }}><CalendarDays size={11} strokeWidth={2} /> {start} — {end}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(`${window.location.origin}/itinerary/${trip.id}`);
+            alert("Public itinerary link copied!");
+          }}
+          style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: 8, padding: "6px 10px", color: "#fff", cursor: "pointer", fontSize: 11, display: "flex", alignItems: "center", gap: 4 }}
+        >
+          <Share2 size={12} strokeWidth={2} /> Share
+        </button>
         <span style={badgeStyle(trip.status || "upcoming")}>{trip.status || "upcoming"}</span>
         <button onClick={onDelete} style={deleteButtonStyle}>
           <Trash2 size={12} strokeWidth={2} />

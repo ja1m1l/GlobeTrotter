@@ -14,8 +14,9 @@ import {
   Ticket,
   Trash2,
   UtensilsCrossed,
+  Share2,
 } from "lucide-react";
-import { tripApi, activityApi, TripData, getUser } from "@/lib/api";
+import { tripApi, activityApi, TripData, getUser, isAuthenticated } from "@/lib/api";
 
 interface ExpenseItem {
   id: string;
@@ -161,10 +162,22 @@ export default function TripBudget() {
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {tripId && (
-            <button onClick={() => router.push(`/itinerary/${tripId}`)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <ArrowLeft size={14} strokeWidth={2} />
-              Return to Itinerary
-            </button>
+            <>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/trip-budget/${tripId}`);
+                  alert("Public budget link copied!");
+                }}
+                style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, padding: "8px 16px", color: "#fff", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                <Share2 size={14} strokeWidth={2} />
+                Share Budget
+              </button>
+              <button onClick={() => router.push(`/itinerary/${tripId}`)} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <ArrowLeft size={14} strokeWidth={2} />
+                Return to Itinerary
+              </button>
+            </>
           )}
           <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
             {user?.firstName?.[0]?.toUpperCase() ?? "U"}
@@ -222,9 +235,11 @@ export default function TripBudget() {
                 </p>
               </div>
             </div>
-            <button onClick={() => setIsEditingBudget(true)} style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
-              Adjust Budget
-            </button>
+            {isAuthenticated() && (
+              <button onClick={() => setIsEditingBudget(true)} style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
+                Adjust Budget
+              </button>
+            )}
           </div>
         )}
 
@@ -248,7 +263,7 @@ export default function TripBudget() {
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               ALLOCATED BUDGET LIMIT
             </span>
-            {isEditingBudget ? (
+            {isEditingBudget && isAuthenticated() ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
                 <input
                   type="number"
@@ -261,7 +276,9 @@ export default function TripBudget() {
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
                 <span style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>${targetBudget.toLocaleString()}</span>
-                <button onClick={() => setIsEditingBudget(true)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer" }}>Edit</button>
+                {isAuthenticated() && (
+                  <button onClick={() => setIsEditingBudget(true)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer" }}>Edit</button>
+                )}
               </div>
             )}
             <span style={{ fontSize: 12, color: isOverBudget ? "#f87171" : "#2dd4bf" }}>

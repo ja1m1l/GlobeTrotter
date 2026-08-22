@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, DollarSign, Plus, Search, Sparkles, Wand2 } from "lucide-react";
-import { tripApi, TripData, getUser, User } from "@/lib/api";
+import { ArrowLeft, DollarSign, Plus, Search, Sparkles, Wand2, Share2 } from "lucide-react";
+import { tripApi, TripData, getUser, User, isAuthenticated } from "@/lib/api";
 
 interface ItinerarySection {
   id: string;
@@ -182,6 +182,17 @@ export default function ItineraryBuilder() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {isAuthenticated() && (
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/itinerary/${tripId}`);
+                  alert("Public itinerary link copied!");
+                }}
+                style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                <Share2 size={14} strokeWidth={2} /> Share Itinerary
+              </button>
+            )}
             <button
               onClick={() => router.push(`/trip-budget/${tripId}`)}
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "10px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
@@ -194,31 +205,35 @@ export default function ItineraryBuilder() {
             >
               <Search size={14} strokeWidth={2} /> Search Activities
             </button>
-            <button
-              onClick={handleRegenerateItinerary}
-              disabled={regenerating}
-              style={{
-                background: regenerating ? "rgba(20,184,166,0.4)" : "linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)",
-                border: "none",
-                borderRadius: 10,
-                padding: "10px 18px",
-                color: "#fff",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: regenerating ? "not-allowed" : "pointer",
-                fontFamily: "inherit",
-                boxShadow: "0 4px 16px rgba(139,92,246,0.3)",
-                opacity: regenerating ? 0.7 : 1,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              {regenerating ? <><Sparkles size={14} strokeWidth={2} /> Regenerating...</> : <><Wand2 size={14} strokeWidth={2} /> AI Regenerate Itinerary</>}
-            </button>
-            <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <ArrowLeft size={14} strokeWidth={2} /> Trip Form
-            </button>
+            {isAuthenticated() && (
+              <>
+                <button
+                  onClick={handleRegenerateItinerary}
+                  disabled={regenerating}
+                  style={{
+                    background: regenerating ? "rgba(20,184,166,0.4)" : "linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)",
+                    border: "none",
+                    borderRadius: 10,
+                    padding: "10px 18px",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: regenerating ? "not-allowed" : "pointer",
+                    fontFamily: "inherit",
+                    boxShadow: "0 4px 16px rgba(139,92,246,0.3)",
+                    opacity: regenerating ? 0.7 : 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  {regenerating ? <><Sparkles size={14} strokeWidth={2} /> Regenerating...</> : <><Wand2 size={14} strokeWidth={2} /> AI Regenerate Itinerary</>}
+                </button>
+                <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <ArrowLeft size={14} strokeWidth={2} /> Trip Form
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -229,12 +244,14 @@ export default function ItineraryBuilder() {
               {/* Section Header */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <h2 style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>{sec.title}</h2>
-                <button
-                  onClick={() => handleDeleteSection(sec.id)}
-                  style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}
-                >
-                  Delete
-                </button>
+                {isAuthenticated() && (
+                  <button
+                    onClick={() => handleDeleteSection(sec.id)}
+                    style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, padding: "4px 10px", color: "#f87171", fontSize: 12, cursor: "pointer" }}
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
 
               {/* Section Description */}
@@ -261,37 +278,39 @@ export default function ItineraryBuilder() {
         </div>
 
         {/* + Add another Section Button (Matching Wireframe) */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "14px 32px",
-              background: "rgba(255,255,255,0.04)",
-              border: "1.5px dashed rgba(255,255,255,0.2)",
-              borderRadius: 14,
-              color: "#fff",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: "pointer",
-              transition: "all 0.2s",
-              fontFamily: "inherit",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#2dd4bf";
-              e.currentTarget.style.background = "rgba(45,212,191,0.08)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-            }}
-          >
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#2dd4bf" }}><Plus size={18} strokeWidth={2.5} /></span>
-            Add another Section
-          </button>
-        </div>
+        {isAuthenticated() && (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "14px 32px",
+                background: "rgba(255,255,255,0.04)",
+                border: "1.5px dashed rgba(255,255,255,0.2)",
+                borderRadius: 14,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#2dd4bf";
+                e.currentTarget.style.background = "rgba(45,212,191,0.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              }}
+            >
+              <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#2dd4bf" }}><Plus size={18} strokeWidth={2.5} /></span>
+              Add another Section
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Modal: + Add another Section */}
