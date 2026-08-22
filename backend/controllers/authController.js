@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const prisma = require('../utils/prisma');
+const { sendPasswordResetEmail } = require('../services/emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'globe_trotter_secret_key_987654321_abc';
 
@@ -234,6 +235,14 @@ exports.forgotPassword = async (req, res) => {
         resetPasswordExpires
       }
     });
+
+    // Send the password reset email
+    try {
+      await sendPasswordResetEmail(user.email, resetToken);
+    } catch (mailError) {
+      console.error('Failed to send reset email:', mailError);
+      // We still return 200/success because the token was saved, but return the token to allow manual validation
+    }
 
     return res.json({
       message: 'If the email exists, a password reset token has been generated.',
