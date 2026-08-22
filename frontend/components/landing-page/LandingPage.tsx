@@ -114,6 +114,9 @@ export default function LandingPage() {
         {/* left space — GlobeTrotter is in layout fixed header */}
         <div />
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Link href="/community" style={{ textDecoration: "none", background: "rgba(45,212,191,0.1)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 8, padding: "6px 12px", color: "#2dd4bf", fontSize: 12, fontWeight: 700 }}>
+            💬 Community Tab
+          </Link>
           <Link href="/profile" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "inherit" }}>
             {/* User avatar */}
             <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>

@@ -181,9 +181,11 @@ export interface TripData {
   startDate: string;
   endDate: string;
   coverImage?: string | null;
+  maxBudget?: number;
   destinationCount?: number;
   status?: "completed" | "upcoming" | "ongoing" | string;
   tripStops?: TripStop[];
+  tripActivities?: any[];
   createdAt: string;
 }
 
@@ -249,6 +251,7 @@ export interface CreateTripPayload {
   endDate?: string;
   description?: string;
   coverImage?: string;
+  maxBudget?: number;
   location?: string;
   cityId?: string;
 }
@@ -294,5 +297,141 @@ export const tripApi = {
   getCities: () =>
     apiFetch<{ cities: City[] }>("/api/trips/cities"),
 };
+
+// ── Activity API (Screen 8) ───────────────────────
+export interface ActivityItem {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  costType: string;
+  costAmount: number;
+  duration: string;
+  rating: number;
+  popularity: number;
+  image?: string | null;
+  cityId?: string | null;
+  cityName?: string | null;
+  createdAt?: string;
+}
+
+export interface TripActivityItem {
+  id: string;
+  tripId: string;
+  activityId: string;
+  cityId?: string | null;
+  activity: ActivityItem;
+  createdAt: string;
+}
+
+export const activityApi = {
+  getActivities: (params?: {
+    search?: string;
+    city?: string;
+    category?: string;
+    costType?: string;
+    duration?: string;
+    sortBy?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ activities: ActivityItem[] }>(`/api/activities${qStr ? `?${qStr}` : ""}`);
+  },
+
+  addActivityToTrip: (payload: { tripId: string; activityId: string; cityId?: string }) =>
+    apiFetch<{ message: string; tripActivity: TripActivityItem }>("/api/activities/trip", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  removeActivityFromTrip: (tripActivityId: string) =>
+    apiFetch<{ message: string }>(`/api/activities/trip/${tripActivityId}`, {
+      method: "DELETE",
+    }),
+
+  getTripActivities: (tripId: string) =>
+    apiFetch<{ tripActivities: TripActivityItem[] }>(`/api/activities/trip/${tripId}`),
+};
+
+// ── Community API (Screen 10) ─────────────────────
+export interface PostCommentItem {
+  id: string;
+  postId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CommunityPostItem {
+  id: string;
+  userId: string;
+  authorName: string;
+  authorAvatar?: string | null;
+  title: string;
+  content: string;
+  location?: string | null;
+  region?: string | null;
+  category?: string | null;
+  image?: string | null;
+  likesCount: number;
+  comments?: PostCommentItem[];
+  createdAt: string;
+}
+
+export const communityApi = {
+  getPosts: (params?: {
+    search?: string;
+    region?: string;
+    category?: string;
+    sortBy?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ posts: CommunityPostItem[] }>(`/api/community${qStr ? `?${qStr}` : ""}`);
+  },
+
+  getPostById: (id: string) =>
+    apiFetch<{ post: CommunityPostItem }>(`/api/community/${id}`),
+
+  createPost: (payload: {
+    title: string;
+    content: string;
+    location?: string;
+    region?: string;
+    category?: string;
+    image?: string;
+  }) =>
+    apiFetch<{ message: string; post: CommunityPostItem }>("/api/community", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  likePost: (id: string) =>
+    apiFetch<{ message: string; likesCount: number }>(`/api/community/${id}/like`, {
+      method: "POST",
+    }),
+
+  addComment: (id: string, content: string) =>
+    apiFetch<{ message: string; comment: PostCommentItem }>(`/api/community/${id}/comment`, {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    }),
+};
+
+
 
 
