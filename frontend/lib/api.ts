@@ -360,5 +360,78 @@ export const activityApi = {
     apiFetch<{ tripActivities: TripActivityItem[] }>(`/api/activities/trip/${tripId}`),
 };
 
+// ── Community API (Screen 10) ─────────────────────
+export interface PostCommentItem {
+  id: string;
+  postId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CommunityPostItem {
+  id: string;
+  userId: string;
+  authorName: string;
+  authorAvatar?: string | null;
+  title: string;
+  content: string;
+  location?: string | null;
+  region?: string | null;
+  category?: string | null;
+  image?: string | null;
+  likesCount: number;
+  comments?: PostCommentItem[];
+  createdAt: string;
+}
+
+export const communityApi = {
+  getPosts: (params?: {
+    search?: string;
+    region?: string;
+    category?: string;
+    sortBy?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ posts: CommunityPostItem[] }>(`/api/community${qStr ? `?${qStr}` : ""}`);
+  },
+
+  getPostById: (id: string) =>
+    apiFetch<{ post: CommunityPostItem }>(`/api/community/${id}`),
+
+  createPost: (payload: {
+    title: string;
+    content: string;
+    location?: string;
+    region?: string;
+    category?: string;
+    image?: string;
+  }) =>
+    apiFetch<{ message: string; post: CommunityPostItem }>("/api/community", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  likePost: (id: string) =>
+    apiFetch<{ message: string; likesCount: number }>(`/api/community/${id}/like`, {
+      method: "POST",
+    }),
+
+  addComment: (id: string, content: string) =>
+    apiFetch<{ message: string; comment: PostCommentItem }>(`/api/community/${id}/comment`, {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    }),
+};
+
+
 
 
