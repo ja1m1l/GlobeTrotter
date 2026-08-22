@@ -69,9 +69,9 @@ export default function CalendarView() {
 
   const [user, setUser] = useState<{ firstName?: string } | null>(null);
 
-  // Month & Year state (Default July 2025)
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 6, 1));
-  const [events, setEvents] = useState<CalendarEvent[]>(SAMPLE_EVENTS);
+  // Month & Year state (Defaults dynamically to current month and year)
+  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
 
   // Controls (Search, Group by, Filter, Sort by) matching Wireframe
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,18 +86,26 @@ export default function CalendarView() {
   const [newActivityTime, setNewActivityTime] = useState("10:00 AM");
 
   useEffect(() => {
-    setUser(getUser());
-    // Load trips from API if available
+    const loggedUser = getUser();
+    setUser(loggedUser);
+
+    const COLORS = ["rgba(45,212,191,0.85)", "rgba(168,85,247,0.85)", "rgba(245,158,11,0.85)", "rgba(59,130,246,0.85)"];
+
+    // Dynamic User Trips fetching
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+
+    // Fetch user dashboard / trips dynamically
     const tripId = (params?.tripId as string) || searchParams.get("tripId");
     if (tripId) {
       tripApi
         .getTripById(tripId)
         .then((res) => {
           if (res.trip) {
-            const startStr = res.trip.startDate ? res.trip.startDate.split("T")[0] : "2025-07-10";
-            const endStr = res.trip.endDate ? res.trip.endDate.split("T")[0] : "2025-07-16";
-            setEvents((prev) => [
-              ...prev,
+            const startStr = res.trip.startDate ? res.trip.startDate.split("T")[0] : `${currentYear}-${currentMonth}-04`;
+            const endStr = res.trip.endDate ? res.trip.endDate.split("T")[0] : `${currentYear}-${currentMonth}-10`;
+            setEvents([
               {
                 id: res.trip.id,
                 tripId: res.trip.id,
@@ -108,10 +116,74 @@ export default function CalendarView() {
                 endDate: endStr,
                 color: "rgba(45,212,191,0.9)",
               },
+              {
+                id: "ev-sample-2",
+                tripId: "t-nyc",
+                tripName: "NYC GETAWAY",
+                title: "NYC GETAWAY",
+                category: "Flight",
+                startDate: `${currentYear}-${currentMonth}-14`,
+                endDate: `${currentYear}-${currentMonth}-18`,
+                color: "rgba(168,85,247,0.85)",
+              },
+              {
+                id: "ev-sample-3",
+                tripId: "t-japan",
+                tripName: "JAPAN ADVENTURE",
+                title: "JAPAN ADVENTURE",
+                category: "Activity",
+                startDate: `${currentYear}-${currentMonth}-16`,
+                endDate: `${currentYear}-${currentMonth}-25`,
+                color: "rgba(245,158,11,0.85)",
+              },
             ]);
           }
         })
         .catch(() => {});
+    } else {
+      // Default initial events for logged in user starting on current month
+      setEvents([
+        {
+          id: "ev-user-1",
+          tripId: "t-paris",
+          tripName: `${loggedUser?.firstName?.toUpperCase() ?? "MY"} PARIS ESCAPE`,
+          title: `${loggedUser?.firstName?.toUpperCase() ?? "MY"} PARIS ESCAPE`,
+          category: "Activity",
+          startDate: `${currentYear}-${currentMonth}-04`,
+          endDate: `${currentYear}-${currentMonth}-08`,
+          color: "rgba(45,212,191,0.85)",
+        },
+        {
+          id: "ev-user-2",
+          tripId: "t-nyc",
+          tripName: "NYC GETAWAY",
+          title: "NYC GETAWAY",
+          category: "Flight",
+          startDate: `${currentYear}-${currentMonth}-14`,
+          endDate: `${currentYear}-${currentMonth}-18`,
+          color: "rgba(168,85,247,0.85)",
+        },
+        {
+          id: "ev-user-3",
+          tripId: "t-japan",
+          tripName: "JAPAN ADVENTURE",
+          title: "JAPAN ADVENTURE",
+          category: "Activity",
+          startDate: `${currentYear}-${currentMonth}-16`,
+          endDate: `${currentYear}-${currentMonth}-25`,
+          color: "rgba(245,158,11,0.85)",
+        },
+        {
+          id: "ev-user-4",
+          tripId: "t-goa",
+          tripName: "GOA RETREAT",
+          title: "GOA RETREAT",
+          category: "Activity",
+          startDate: `${currentYear}-${currentMonth}-26`,
+          endDate: `${currentYear}-${currentMonth}-30`,
+          color: "rgba(59,130,246,0.85)",
+        },
+      ]);
     }
   }, [params, searchParams]);
 
@@ -199,11 +271,31 @@ export default function CalendarView() {
 
       {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-          GlobeTrotter
-        </button>
-        <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
-          {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+        {/* left space — GlobeTrotter is rendered by root layout */}
+        <div />
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button
+            onClick={() => router.push("/")}
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 10,
+              padding: "8px 16px",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            ← Dashboard
+          </button>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
+            {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+          </div>
         </div>
       </header>
 

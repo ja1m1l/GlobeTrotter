@@ -13,42 +13,16 @@ interface ItinerarySection {
   budget: string;
 }
 
-const INITIAL_SECTIONS: ItinerarySection[] = [
-  {
-    id: "sec-1",
-    title: "Section 1: Flights & Transport",
-    description: "All the necessary information about this section. This can be anything like travel section, hotel or any other activity.",
-    startDate: "Jul 10, 2025",
-    endDate: "Jul 11, 2025",
-    budget: "$850",
-  },
-  {
-    id: "sec-2",
-    title: "Section 2: Hotel & Accommodations",
-    description: "All the necessary information about this section. Reservation at Le Grand Hotel Paris with daily breakfast included.",
-    startDate: "Jul 11, 2025",
-    endDate: "Jul 16, 2025",
-    budget: "$1,200",
-  },
-  {
-    id: "sec-3",
-    title: "Section 3: Sightseeing & Activities",
-    description: "All the necessary information about this section. Louvre Museum priority pass, Eiffel Tower summit tour, and Seine river dinner cruise.",
-    startDate: "Jul 12, 2025",
-    endDate: "Jul 15, 2025",
-    budget: "$450",
-  },
-];
-
 export default function ItineraryBuilder() {
   const router = useRouter();
   const params = useParams();
   const tripId = params.id as string;
 
   const [trip, setTrip] = useState<TripData | null>(null);
-  const [sections, setSections] = useState<ItinerarySection[]>(INITIAL_SECTIONS);
+  const [sections, setSections] = useState<ItinerarySection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [regenerating, setRegenerating] = useState(false);
 
   // Modal State for + Add another Section
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,19 +34,34 @@ export default function ItineraryBuilder() {
 
   const [user, setUser] = useState<User | null>(null);
 
+  const saveItineraryToDB = async (updatedSections: ItinerarySection[]) => {
+    try {
+      await tripApi.update(tripId, {
+        itinerary: JSON.stringify(updatedSections),
+      });
+    } catch (err) {
+      console.error("Failed to auto-save itinerary:", err);
+    }
+  };
+
   useEffect(() => {
     setUser(getUser());
     if (!tripId) return;
 
-    // Fetch trip details from backend
     tripApi
       .getTripById(tripId)
       .then((res) => {
         setTrip(res.trip);
+        if (res.trip.itinerary) {
+          try {
+            setSections(JSON.parse(res.trip.itinerary));
+          } catch (e) {
+            console.error("Failed to parse itinerary:", e);
+          }
+        }
         setLoading(false);
       })
       .catch((err) => {
-        // Fallback for demo trip
         setTrip({
           id: tripId,
           name: "My Planned Trip",
@@ -104,7 +93,9 @@ export default function ItineraryBuilder() {
       budget: newBudget.startsWith("$") ? newBudget : `$${newBudget || "300"}`,
     };
 
-    setSections([...sections, newSec]);
+    const updated = [...sections, newSec];
+    setSections(updated);
+    saveItineraryToDB(updated);
     setNewTitle("");
     setNewDesc("");
     setNewStartDate("");
@@ -114,7 +105,32 @@ export default function ItineraryBuilder() {
   };
 
   const handleDeleteSection = (id: string) => {
-    setSections(sections.filter((s) => s.id !== id));
+    const updated = sections.filter((s) => s.id !== id);
+    setSections(updated);
+    saveItineraryToDB(updated);
+  };
+
+  const handleRegenerateItinerary = async () => {
+    if (!tripId) return;
+    setRegenerating(true);
+    setError("");
+    try {
+      const res = await tripApi.regenerateItinerary(tripId);
+      if (res.trip.itinerary) {
+        try {
+          const newSections = JSON.parse(res.trip.itinerary);
+          setSections(newSections);
+          saveItineraryToDB(newSections);
+        } catch (e) {
+          console.error("Failed to parse regenerated itinerary:", e);
+          setError("Failed to parse the regenerated itinerary.");
+        }
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to regenerate itinerary.");
+    } finally {
+      setRegenerating(false);
+    }
   };
 
   if (loading) {
@@ -176,6 +192,25 @@ export default function ItineraryBuilder() {
               style={{ background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(20,184,166,0.3)" }}
             >
               🔍 Search Activities
+            </button>
+            <button
+              onClick={handleRegenerateItinerary}
+              disabled={regenerating}
+              style={{
+                background: regenerating ? "rgba(20,184,166,0.4)" : "linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%)",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 18px",
+                color: "#fff",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: regenerating ? "not-allowed" : "pointer",
+                fontFamily: "inherit",
+                boxShadow: "0 4px 16px rgba(139,92,246,0.3)",
+                opacity: regenerating ? 0.7 : 1,
+              }}
+            >
+              {regenerating ? "🔄 Regenerating..." : "✨ AI Regenerate Itinerary"}
             </button>
             <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
               ← Trip Form
