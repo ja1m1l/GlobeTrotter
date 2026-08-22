@@ -35,6 +35,8 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  role?: "USER" | "ADMIN" | string;
+  status?: "Active" | "Disabled" | string;
   photoUrl?: string | null;
   firstName: string;
   lastName: string;
@@ -97,7 +99,8 @@ async function apiFetch<T>(
 
 // ── Auth API ───────────────────────────────────────
 export interface LoginPayload {
-  username: string;
+  username?: string;
+  email?: string;
   password: string;
 }
 
@@ -468,6 +471,64 @@ export const communityApi = {
       body: JSON.stringify({ content }),
     }),
 };
+
+// ── Admin API (Screen 12) ─────────────────────────
+export interface AdminUserItem {
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "USER" | "ADMIN" | string;
+  status: "Active" | "Disabled" | string;
+  createdAt: string;
+  _count?: {
+    trips: number;
+    communityPosts: number;
+  };
+}
+
+export interface AdminAnalyticsData {
+  totalUsers: number;
+  activeUsers: number;
+  totalTrips: number;
+  totalActivities: number;
+  totalCommunityPosts: number;
+  popularCities: Array<{ id: string; name: string; tripsCount: number }>;
+  popularActivities: Array<{ name: string; category: string; count: number }>;
+  tripTrends: Array<{ month: string; trips: number; users: number }>;
+  regionDistribution: Array<{ region: string; percentage: number; color: string }>;
+}
+
+export const adminApi = {
+  getAnalytics: () =>
+    apiFetch<{ analytics: AdminAnalyticsData }>("/api/admin/analytics"),
+
+  getUsers: (params?: { search?: string; status?: string }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ users: AdminUserItem[] }>(`/api/admin/users${qStr ? `?${qStr}` : ""}`);
+  },
+
+  toggleUserStatus: (id: string, status: string) =>
+    apiFetch<{ message: string; user: AdminUserItem }>(`/api/admin/users/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+
+  deleteUser: (id: string) =>
+    apiFetch<{ message: string }>(`/api/admin/users/${id}`, {
+      method: "DELETE",
+    }),
+};
+
 
 
 

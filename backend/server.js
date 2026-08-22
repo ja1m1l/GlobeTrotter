@@ -6,6 +6,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const tripRoutes = require('./routes/tripRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const communityRoutes = require('./routes/communityRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const prisma = require('./utils/prisma');
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
