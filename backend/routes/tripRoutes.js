@@ -4,15 +4,20 @@ const tripController = require('../controllers/tripController');
 const authMiddleware = require('../middleware/auth');
 
 // All trip routes require authentication
-router.post('/', authMiddleware, tripController.createTrip);
-router.put('/:id', authMiddleware, tripController.updateTrip);
-router.delete('/:id', authMiddleware, tripController.deleteTrip);
-// All trip endpoints require authentication
 router.use(authMiddleware);
 
+// Specific path routes FIRST
 router.get('/cities', tripController.getCities);
+
+// Root path routes
 router.post('/', tripController.createTrip);
+
+// Parameterized path routes LAST
 router.get('/:id', tripController.getTripById);
+router.put('/:id', tripController.updateTrip);
+router.delete('/:id', tripController.deleteTrip);
+
+// Trip stop sub-routes
 router.post('/:id/stops', tripController.addTripStop);
 router.delete('/:id/stops/:stopId', tripController.deleteTripStop);
 

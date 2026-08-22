@@ -9,7 +9,6 @@ exports.createTrip = async (req, res) => {
     const userId = req.user.userId;
     const { name, startDate, endDate, description, coverImage, location, cityId } = req.body;
 
-    // Validation
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
       return res.status(400).json({ error: 'Trip name is required.' });
     }
@@ -41,7 +40,7 @@ exports.createTrip = async (req, res) => {
       },
     });
 
-    // If a city/location was selected during trip creation, create initial trip stop
+    // If cityId or location text provided, add initial trip stop
     if (cityId) {
       const cityExists = await prisma.city.findUnique({ where: { id: cityId } });
       if (cityExists) {
@@ -53,7 +52,6 @@ exports.createTrip = async (req, res) => {
         });
       }
     } else if (location) {
-      // Find matching city by name if provided as text
       const matchingCity = await prisma.city.findFirst({
         where: { name: { equals: location.trim(), mode: 'insensitive' } },
       });
@@ -70,12 +68,59 @@ exports.createTrip = async (req, res) => {
 
     return res.status(201).json({
       message: 'Trip created successfully',
-      trip
+      trip,
+    });
+  } catch (error) {
+    console.error('Error creating trip:', error);
+    return res.status(500).json({ error: 'Failed to create trip.' });
+  }
+};
+
+/**
+ * GET /api/trips/cities
+ * Fetch list of destination cities
+ */
+exports.getCities = async (req, res) => {
+  try {
+    const cities = await prisma.city.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return res.json({ cities });
+  } catch (error) {
+    console.error('Error fetching cities:', error);
+    return res.status(500).json({ error: 'Failed to fetch cities.' });
+  }
+};
+
+/**
+ * GET /api/trips/:id
+ * Get trip details by ID
+ */
+exports.getTripById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const trip = await prisma.trip.findFirst({
+      where: { id, userId },
+      include: {
+        tripStops: {
+          include: {
+            city: true,
+          },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
     });
 
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found.' });
+    }
+
+    return res.json({ trip });
   } catch (error) {
-    console.error('Create trip error:', error);
-    return res.status(500).json({ error: 'Internal server error creating trip.' });
+    console.error('Error fetching trip:', error);
+    return res.status(500).json({ error: 'Failed to fetch trip details.' });
   }
 };
 
@@ -90,7 +135,7 @@ exports.updateTrip = async (req, res) => {
     const { name, description, startDate, endDate, coverImage } = req.body;
 
     const trip = await prisma.trip.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!trip) {
@@ -113,14 +158,13 @@ exports.updateTrip = async (req, res) => {
 
     const updated = await prisma.trip.update({
       where: { id },
-      data: dataToUpdate
+      data: dataToUpdate,
     });
 
     return res.json({
       message: 'Trip updated successfully',
-      trip: updated
+      trip: updated,
     });
-
   } catch (error) {
     console.error('Update trip error:', error);
     return res.status(500).json({ error: 'Internal server error updating trip.' });
@@ -167,24 +211,20 @@ exports.getTripById = async (req, res) => {
 
     const trip = await prisma.trip.findFirst({
       where: { id, userId },
-      include: {
-        tripStops: {
-          include: {
-            city: true,
-          },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
     });
 
     if (!trip) {
-      return res.status(404).json({ error: 'Trip not found.' });
+      return res.status(404).json({ error: 'Trip not found or unauthorized.' });
     }
 
-    return res.json({ trip });
+    await prisma.trip.delete({
+      where: { id },
+    });
+
+    return res.json({ message: 'Trip deleted successfully' });
   } catch (error) {
-    console.error('Error fetching trip:', error);
-    return res.status(500).json({ error: 'Failed to fetch trip details.' });
+    console.error('Delete trip error:', error);
+    return res.status(500).json({ error: 'Internal server error deleting trip.' });
   }
 };
 
@@ -198,7 +238,6 @@ exports.addTripStop = async (req, res) => {
     const userId = req.user.userId;
     const { cityId, cityName } = req.body;
 
-    // Verify trip ownership
     const trip = await prisma.trip.findFirst({ where: { id: tripId, userId } });
     if (!trip) {
       return res.status(404).json({ error: 'Trip not found or unauthorized.' });
@@ -212,7 +251,6 @@ exports.addTripStop = async (req, res) => {
       });
 
       if (!city) {
-        // Create city if it doesn't exist
         city = await prisma.city.create({
           data: {
             name: cityName.trim(),
@@ -267,21 +305,5 @@ exports.deleteTripStop = async (req, res) => {
   } catch (error) {
     console.error('Error deleting trip stop:', error);
     return res.status(500).json({ error: 'Failed to remove stop.' });
-  }
-};
-
-/**
- * GET /api/trips/cities
- * Fetch list of destination cities
- */
-exports.getCities = async (req, res) => {
-  try {
-    const cities = await prisma.city.findMany({
-      orderBy: { name: 'asc' },
-    });
-    return res.json({ cities });
-  } catch (error) {
-    console.error('Error fetching cities:', error);
-    return res.status(500).json({ error: 'Failed to fetch cities.' });
   }
 };
