@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, DollarSign, Plus, Search, Sparkles, Wand2, Share2 } from "lucide-react";
+import { ArrowLeft, IndianRupee, Plus, Search, Sparkles, Wand2, Share2 } from "lucide-react";
 import { tripApi, TripData, getUser, User, isAuthenticated, publicTripApi } from "@/lib/api";
 
 interface ItinerarySection {
@@ -92,7 +92,7 @@ export default function ItineraryBuilder() {
         "All the necessary information about this section. This can be anything like travel section, hotel or any other activity.",
       startDate: newStartDate || "Jul 16, 2025",
       endDate: newEndDate || "Jul 20, 2025",
-      budget: newBudget.startsWith("$") ? newBudget : `$${newBudget || "300"}`,
+      budget: newBudget.startsWith("₹") ? newBudget : `₹${newBudget || "3500"}`,
     };
 
     const updated = [...sections, newSec];
@@ -198,7 +198,7 @@ export default function ItineraryBuilder() {
               onClick={() => router.push(`/trip-budget/${tripId}`)}
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "10px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "inline-flex", alignItems: "center", gap: 6 }}
             >
-              <DollarSign size={14} strokeWidth={2} /> Trip Budget
+              <IndianRupee size={14} strokeWidth={2} /> Trip Budget
             </button>
             <button
               onClick={() => router.push(`/activity-search?tripId=${tripId}`)}
@@ -271,7 +271,7 @@ export default function ItineraryBuilder() {
                 {/* Budget Pill */}
                 <div style={pillStyle}>
                   <span style={{ color: "rgba(255,255,255,0.4)" }}>Budget of this section:</span>
-                  <span style={{ color: "#2dd4bf", fontWeight: 700 }}>{sec.budget}</span>
+                  <span style={{ color: "#2dd4bf", fontWeight: 700 }}>{sec.budget ? sec.budget.replace(/\$/g, "₹") : "₹0"}</span>
                 </div>
               </div>
             </div>
@@ -377,7 +377,7 @@ export default function ItineraryBuilder() {
                 <label style={labelStyle}>Section Budget</label>
                 <input
                   type="text"
-                  placeholder="e.g. $350"
+                  placeholder="e.g. ₹3,500"
                   value={newBudget}
                   onChange={(e) => setNewBudget(e.target.value)}
                   style={inputStyle}

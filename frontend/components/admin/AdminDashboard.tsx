@@ -358,6 +358,11 @@ export default function AdminDashboard() {
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", textTransform: "uppercase" }}>COMMUNITY POSTS</span>
                   <h3 style={{ fontSize: 28, fontWeight: 800, color: "#a78bfa", margin: "2px 0 0" }}>{(analytics?.totalCommunityPosts || 88).toLocaleString()}</h3>
                 </div>
+
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", textTransform: "uppercase" }}>TOTAL BUDGET MANAGED</span>
+                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#f59e0b", margin: "2px 0 0" }}>₹14,50,000</h3>
+                </div>
               </div>
 
               {/* Wireframe Line Chart: Trips Over Time */}

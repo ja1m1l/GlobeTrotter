@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearAuth, getUser, authApi, dashboardApi, User, TripData } from "@/lib/api";
-import { Calendar, MessageSquare, BadgeDollarSign, Plane, Landmark, Map, Share2 } from "lucide-react";
+import { Calendar, MessageSquare, IndianRupee, Plane, Landmark, Map, Share2 } from "lucide-react";
 
 interface Trip {
   id: string;
@@ -207,9 +207,9 @@ export default function LandingPage() {
           <SectionTitle>Budget Highlights</SectionTitle>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
             {[
-              { label: "Total Budget", value: "$5,000", sub: "Across 4 planned trips", icon: <BadgeDollarSign size={24} /> },
-              { label: "Total Spent", value: "$3,250", sub: "Completed trips", icon: <Plane size={24} /> },
-              { label: "Remaining Fund", value: "$1,750", sub: "Available for upcoming", icon: <Landmark size={24} /> },
+              { label: "Total Budget", value: "₹50,000", sub: "Across 4 planned trips", icon: <IndianRupee size={24} /> },
+              { label: "Total Spent", value: "₹32,500", sub: "Completed trips", icon: <Plane size={24} /> },
+              { label: "Remaining Fund", value: "₹17,500", sub: "Available for upcoming", icon: <Landmark size={24} /> },
             ].map((card) => (
               <div key={card.label} style={glassCard}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>

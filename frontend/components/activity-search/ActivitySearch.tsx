@@ -6,7 +6,7 @@ import {
   ArrowLeft,
   Check,
   Clock3,
-  DollarSign,
+  IndianRupee,
   MapPin,
   Plus,
   Search,
@@ -27,9 +27,9 @@ const CATEGORIES = [
 const COST_TYPES = [
   { id: "all", label: "All Prices" },
   { id: "Free", label: "Free" },
-  { id: "$", label: "$ (Budget)" },
-  { id: "$$", label: "$$ (Moderate)" },
-  { id: "$$$", label: "$$$ (Luxury)" },
+  { id: "₹", label: "₹ (Budget)" },
+  { id: "₹₹", label: "₹₹ (Moderate)" },
+  { id: "₹₹₹", label: "₹₹₹ (Luxury)" },
 ];
 
 const DURATIONS = [
@@ -337,7 +337,7 @@ export default function ActivitySearch() {
 
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
                         <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 5 }}><Clock3 size={12} strokeWidth={2} /> {act.duration}</span>
-                        <span style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}><DollarSign size={12} strokeWidth={2} /> {act.costType} (${act.costAmount})</span>
+                        <span style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5 }}>{act.costType} (₹{act.costAmount})</span>
                       </div>
                     </div>
 

@@ -297,10 +297,10 @@ export default function PlanTrip() {
 
           {/* Max Budget */}
           <div>
-            <label style={labelStyle}>Maximum Budget (Optional)</label>
+            <label style={labelStyle}>Maximum Budget in ₹ (Optional)</label>
             <input
               type="number"
-              placeholder="e.g. 2000"
+              placeholder="e.g. 50000"
               value={maxBudget}
               onChange={(e) => setMaxBudget(e.target.value)}
               style={inputStyle}

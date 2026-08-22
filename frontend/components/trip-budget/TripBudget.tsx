@@ -7,7 +7,7 @@ import {
   ArrowLeft,
   BarChart3,
   CalendarDays,
-  DollarSign,
+  IndianRupee,
   Hotel,
   Plane,
   Search,
@@ -231,7 +231,7 @@ export default function TripBudget() {
               <div>
                 <h3 style={{ fontSize: 15, fontWeight: 700, color: "#f87171", margin: 0 }}>OVER BUDGET ALERT</h3>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", margin: "2px 0 0" }}>
-                  Your total estimated expense of <strong>${totalCost.toLocaleString()}</strong> exceeds your allocated budget limit of <strong>${targetBudget.toLocaleString()}</strong> by <strong>${overBudgetAmount.toLocaleString()}</strong>!
+                  Your total estimated expense of <strong>₹{totalCost.toLocaleString()}</strong> exceeds your allocated budget limit of <strong>₹{targetBudget.toLocaleString()}</strong> by <strong>₹{overBudgetAmount.toLocaleString()}</strong>!
                 </p>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function TripBudget() {
               TOTAL ESTIMATED COST
             </span>
             <h2 style={{ fontSize: 36, fontWeight: 800, color: "#fff", margin: "4px 0 2px" }}>
-              ${totalCost.toLocaleString()}
+              ₹{totalCost.toLocaleString()}
             </h2>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
               {tripDaysCount} Days Trip • {expenses.length} expense items
@@ -275,14 +275,14 @@ export default function TripBudget() {
               </div>
             ) : (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
-                <span style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>${targetBudget.toLocaleString()}</span>
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>₹{targetBudget.toLocaleString()}</span>
                 {isAuthenticated() && (
                   <button onClick={() => setIsEditingBudget(true)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 8px", color: "rgba(255,255,255,0.5)", fontSize: 11, cursor: "pointer" }}>Edit</button>
                 )}
               </div>
             )}
             <span style={{ fontSize: 12, color: isOverBudget ? "#f87171" : "#2dd4bf" }}>
-              {isOverBudget ? `Over budget by $${overBudgetAmount}` : `Under budget by $${targetBudget - totalCost}`}
+              {isOverBudget ? `Over budget by ₹${overBudgetAmount}` : `Under budget by ₹${targetBudget - totalCost}`}
             </span>
           </div>
 
@@ -292,7 +292,7 @@ export default function TripBudget() {
               AVERAGE COST / DAY
             </span>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "4px 0 2px" }}>
-              ${avgCostPerDay} <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: 400 }}>/ day</span>
+              ₹{avgCostPerDay} <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", fontWeight: 400 }}>/ day</span>
             </h2>
             <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Calculated across {tripDaysCount} days</span>
           </div>
@@ -314,7 +314,7 @@ export default function TripBudget() {
                   <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.8)", display: "inline-flex", alignItems: "center", gap: 6 }}><Icon size={13} strokeWidth={2} /> {c.label}</span>
                   <span style={{ fontSize: 11, fontWeight: 600, color: c.color }}>{pct}%</span>
                 </div>
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>${c.cost.toLocaleString()}</h3>
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#fff", margin: 0 }}>₹{c.cost.toLocaleString()}</h3>
 
                 {/* Progress bar visual chart */}
                 <div style={{ width: "100%", height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden", marginTop: 4 }}>
@@ -337,10 +337,10 @@ export default function TripBudget() {
             <div style={{ width: `${(breakdown.Meals / totalCost) * 100}%`, background: "#f59e0b" }} title="Meals" />
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#a855f7" }} /> Stay (${breakdown.Stay})</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3b82f6" }} /> Transport (${breakdown.Transport})</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#2dd4bf" }} /> Activities (${breakdown.Activities})</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} /> Meals (${breakdown.Meals})</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#a855f7" }} /> Stay (₹{breakdown.Stay})</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3b82f6" }} /> Transport (₹{breakdown.Transport})</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#2dd4bf" }} /> Activities (₹{breakdown.Activities})</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b" }} /> Meals (₹{breakdown.Meals})</div>
           </div>
         </section>
 
@@ -370,7 +370,7 @@ export default function TripBudget() {
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>Physical Activity</span>
                   </div>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>Expense: ${dayTotal}</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>Expense: ₹{dayTotal}</span>
                 </div>
 
                 {/* Physical Activity Items and Expenses */}
@@ -385,7 +385,7 @@ export default function TripBudget() {
 
                       {/* Expense Box */}
                       <div style={{ width: 110, padding: "12px 14px", background: "rgba(20,184,166,0.1)", border: "1px solid rgba(45,212,191,0.25)", borderRadius: 12, color: "#2dd4bf", fontSize: 14, fontWeight: 700, textAlign: "center" }}>
-                        ${exp.cost}
+                        ₹{exp.cost}
                       </div>
                     </div>
                   ))}
