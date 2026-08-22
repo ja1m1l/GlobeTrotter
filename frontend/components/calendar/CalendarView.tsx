@@ -3,14 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { AlertTriangle, ArrowLeft, ArrowRight, CalendarDays, Plus, Search } from "lucide-react";
-import { tripApi, getUser, TripData } from "@/lib/api";
+import { tripApi, dashboardApi, getUser, TripData } from "@/lib/api";
 
 interface CalendarEvent {
   id: string;
   tripId: string;
   tripName: string;
   title: string;
-  category: "Flight" | "Hotel" | "Activity" | "Dining";
+  category: "Flight" | "Hotel" | "Activity" | "Dining" | "Completed Trip" | "Planned Trip" | string;
   startDate: string; // YYYY-MM-DD
   endDate: string;   // YYYY-MM-DD
   startTime?: string;
@@ -73,6 +73,7 @@ export default function CalendarView() {
   // Month & Year state (Defaults dynamically to current month and year)
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Controls (Search, Group by, Filter, Sort by) matching Wireframe
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,102 +91,47 @@ export default function CalendarView() {
     const loggedUser = getUser();
     setUser(loggedUser);
 
-    const COLORS = ["rgba(45,212,191,0.85)", "rgba(168,85,247,0.85)", "rgba(245,158,11,0.85)", "rgba(59,130,246,0.85)"];
+    setLoading(true);
+    dashboardApi
+      .getPreviousTrips({ scope: "mine", limit: 100 })
+      .then((res) => {
+        const userTrips: TripData[] = res.data || [];
+        const mappedEvents: CalendarEvent[] = userTrips.map((trip, idx) => {
+          const startStr = trip.startDate ? trip.startDate.split("T")[0] : new Date().toISOString().split("T")[0];
+          const endStr = trip.endDate ? trip.endDate.split("T")[0] : startStr;
+          
+          const isCompleted = trip.status === "completed" || new Date(endStr) < new Date();
+          const statusTag = isCompleted ? " (COMPLETED)" : " (PLANNED)";
+          
+          // Color coding: Teal for Planned/Upcoming, Blue/Purple for Completed
+          const color = isCompleted
+            ? (idx % 2 === 0 ? "rgba(59,130,246,0.85)" : "rgba(168,85,247,0.85)")
+            : "rgba(45,212,191,0.85)";
 
-    // Dynamic User Trips fetching
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+          return {
+            id: trip.id,
+            tripId: trip.id,
+            tripName: (trip.name + statusTag).toUpperCase(),
+            title: (trip.name + statusTag).toUpperCase(),
+            category: isCompleted ? "Completed Trip" : "Planned Trip",
+            startDate: startStr,
+            endDate: endStr,
+            color,
+          };
+        });
 
-    // Fetch user dashboard / trips dynamically
-    const tripId = (params?.tripId as string) || searchParams.get("tripId");
-    if (tripId) {
-      tripApi
-        .getTripById(tripId)
-        .then((res) => {
-          if (res.trip) {
-            const startStr = res.trip.startDate ? res.trip.startDate.split("T")[0] : `${currentYear}-${currentMonth}-04`;
-            const endStr = res.trip.endDate ? res.trip.endDate.split("T")[0] : `${currentYear}-${currentMonth}-10`;
-            setEvents([
-              {
-                id: res.trip.id,
-                tripId: res.trip.id,
-                tripName: res.trip.name.toUpperCase(),
-                title: res.trip.name.toUpperCase(),
-                category: "Activity",
-                startDate: startStr,
-                endDate: endStr,
-                color: "rgba(45,212,191,0.9)",
-              },
-              {
-                id: "ev-sample-2",
-                tripId: "t-nyc",
-                tripName: "NYC GETAWAY",
-                title: "NYC GETAWAY",
-                category: "Flight",
-                startDate: `${currentYear}-${currentMonth}-14`,
-                endDate: `${currentYear}-${currentMonth}-18`,
-                color: "rgba(168,85,247,0.85)",
-              },
-              {
-                id: "ev-sample-3",
-                tripId: "t-japan",
-                tripName: "JAPAN ADVENTURE",
-                title: "JAPAN ADVENTURE",
-                category: "Activity",
-                startDate: `${currentYear}-${currentMonth}-16`,
-                endDate: `${currentYear}-${currentMonth}-25`,
-                color: "rgba(245,158,11,0.85)",
-              },
-            ]);
+        setEvents(mappedEvents);
+
+        // If user has trips, navigate calendar to the first trip's start date
+        if (userTrips.length > 0 && userTrips[0].startDate) {
+          const firstTripDate = new Date(userTrips[0].startDate);
+          if (!isNaN(firstTripDate.getTime())) {
+            setCurrentDate(firstTripDate);
           }
-        })
-        .catch(() => {});
-    } else {
-      // Default initial events for logged in user starting on current month
-      setEvents([
-        {
-          id: "ev-user-1",
-          tripId: "t-paris",
-          tripName: `${loggedUser?.firstName?.toUpperCase() ?? "MY"} PARIS ESCAPE`,
-          title: `${loggedUser?.firstName?.toUpperCase() ?? "MY"} PARIS ESCAPE`,
-          category: "Activity",
-          startDate: `${currentYear}-${currentMonth}-04`,
-          endDate: `${currentYear}-${currentMonth}-08`,
-          color: "rgba(45,212,191,0.85)",
-        },
-        {
-          id: "ev-user-2",
-          tripId: "t-nyc",
-          tripName: "NYC GETAWAY",
-          title: "NYC GETAWAY",
-          category: "Flight",
-          startDate: `${currentYear}-${currentMonth}-14`,
-          endDate: `${currentYear}-${currentMonth}-18`,
-          color: "rgba(168,85,247,0.85)",
-        },
-        {
-          id: "ev-user-3",
-          tripId: "t-japan",
-          tripName: "JAPAN ADVENTURE",
-          title: "JAPAN ADVENTURE",
-          category: "Activity",
-          startDate: `${currentYear}-${currentMonth}-16`,
-          endDate: `${currentYear}-${currentMonth}-25`,
-          color: "rgba(245,158,11,0.85)",
-        },
-        {
-          id: "ev-user-4",
-          tripId: "t-goa",
-          tripName: "GOA RETREAT",
-          title: "GOA RETREAT",
-          category: "Activity",
-          startDate: `${currentYear}-${currentMonth}-26`,
-          endDate: `${currentYear}-${currentMonth}-30`,
-          color: "rgba(59,130,246,0.85)",
-        },
-      ]);
-    }
+        }
+      })
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
   }, [params, searchParams]);
 
   // Navigate Previous / Next Month

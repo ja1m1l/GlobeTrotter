@@ -11,5 +11,6 @@ router.get('/:id', communityController.getPostById);
 router.post('/', communityController.createPost);
 router.post('/:id/like', communityController.likePost);
 router.post('/:id/comment', communityController.addComment);
+router.delete('/:id', communityController.deletePost);
 
 module.exports = router;

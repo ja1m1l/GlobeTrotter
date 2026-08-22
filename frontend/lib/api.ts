@@ -537,6 +537,11 @@ export const communityApi = {
       method: "POST",
       body: JSON.stringify({ content }),
     }),
+
+  deletePost: (id: string) =>
+    apiFetch<{ message: string; id: string }>(`/api/community/${id}`, {
+      method: "DELETE",
+    }),
 };
 
 // ── Admin API (Screen 12) ─────────────────────────
