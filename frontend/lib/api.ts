@@ -4,6 +4,43 @@
  */
 
 const BASE_URL = "";
+const S3_URL = process.env.NEXT_PUBLIC_S3_URL;
+const S3_JWT = process.env.NEXT_PUBLIC_S3_JWT;
+
+export async function uploadProfileImage(file: File): Promise<string> {
+  if (!S3_URL || !S3_JWT) {
+    throw new Error("Profile image upload is not configured.");
+  }
+
+  const imageBase64 = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      const [, base64] = result.split(",");
+      if (!base64) reject(new Error("Could not read the profile image."));
+      else resolve(base64);
+    };
+    reader.onerror = () => reject(new Error("Could not read the profile image."));
+    reader.readAsDataURL(file);
+  });
+
+  const response = await fetch(S3_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${S3_JWT}`,
+    },
+    body: JSON.stringify({ contentType: file.type, imageBase64 }),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || result.message || "Profile image upload failed.");
+  }
+
+  const imageUrl = result.imageUrl || result.url || result.data?.imageUrl || result.data?.url;
+  if (!imageUrl) throw new Error("Profile image upload did not return an image URL.");
+  return imageUrl;
+}
 
 // ── Token helpers ──────────────────────────────────
 export const getToken = (): string | null =>

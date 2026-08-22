@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { authApi, setToken, setUser } from "@/lib/api";
+import { authApi, setToken, setUser, uploadProfileImage } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -54,13 +54,17 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
+      let photoUrl: string | undefined;
+      const file = fileRef.current?.files?.[0];
+      if (file) photoUrl = await uploadProfileImage(file);
+
       const res = await authApi.signup({
         username: form.username,
         email: form.email,
         password: form.password,
         firstName: form.firstName,
         lastName: form.lastName,
-        photoUrl: avatar ?? undefined,
+        photoUrl,
         phoneNumber: form.phone || undefined,
         city: form.city || undefined,
         country: form.country || undefined,

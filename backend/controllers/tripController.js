@@ -46,7 +46,7 @@ exports.createTrip = async (req, res) => {
       }
     }
 
-    if (matchingCity && matchingCity.image) {
+    if (matchingCity && matchingCity.image && !resolvedCoverImage) {
       resolvedCoverImage = matchingCity.image;
     } else if (location && !resolvedCoverImage) {
       const kw = location.toLowerCase();
@@ -142,12 +142,6 @@ exports.getTripById = async (req, res) => {
           },
           orderBy: { createdAt: 'asc' },
         },
-        tripActivities: {
-          include: {
-            activity: true,
-          },
-          orderBy: { createdAt: 'desc' },
-        },
       },
     });
 
@@ -233,34 +227,6 @@ exports.deleteTrip = async (req, res) => {
 
     return res.json({ message: 'Trip deleted successfully' });
 
-  } catch (error) {
-    console.error('Delete trip error:', error);
-    return res.status(500).json({ error: 'Internal server error deleting trip.' });
-  }
-};
-
-/**
- * GET /api/trips/:id
- * Get trip details by ID
- */
-exports.getTripById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.userId;
-
-    const trip = await prisma.trip.findFirst({
-      where: { id, userId },
-    });
-
-    if (!trip) {
-      return res.status(404).json({ error: 'Trip not found or unauthorized.' });
-    }
-
-    await prisma.trip.delete({
-      where: { id },
-    });
-
-    return res.json({ message: 'Trip deleted successfully' });
   } catch (error) {
     console.error('Delete trip error:', error);
     return res.status(500).json({ error: 'Internal server error deleting trip.' });

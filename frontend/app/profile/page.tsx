@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User, getGlobalCountriesAndCities } from "@/lib/api";
+import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User, getGlobalCountriesAndCities, uploadProfileImage } from "@/lib/api";
 
 const REGION_IMAGES: Record<string, string> = {
   Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
@@ -35,6 +35,7 @@ export default function ProfilePage() {
     bio: "",
   });
   const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
 
   const [countriesCities, setCountriesCities] = useState<Record<string, string[]>>({});
@@ -84,6 +85,7 @@ export default function ProfilePage() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setAvatarFile(file);
     const reader = new FileReader();
     reader.onload = () => setAvatar(reader.result as string);
     reader.readAsDataURL(file);
@@ -93,6 +95,7 @@ export default function ProfilePage() {
     e.preventDefault();
     setSaveLoading(true);
     try {
+      const photoUrl = avatarFile ? await uploadProfileImage(avatarFile) : avatar || undefined;
       const res = await authApi.updateProfile({
         firstName: form.firstName,
         lastName: form.lastName,
@@ -101,7 +104,7 @@ export default function ProfilePage() {
         city: form.city || undefined,
         country: form.country || undefined,
         additionalInfo: form.bio || undefined,
-        photoUrl: avatar || undefined,
+        photoUrl,
       });
       setUserState(res.user);
       setUser(res.user); // sync with cache
