@@ -121,8 +121,13 @@ export default function ProfilePage() {
 
       {/* Header */}
       <header style={headerStyle}>
-        <Link href="/" style={{ textDecoration: "none", color: "#fff", display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>← Dashboard</span>
+        <Link href="/" style={{ textDecoration: "none", color: "#fff", display: "flex", alignItems: "center", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20 }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button onClick={handleLogout} style={signOutButtonStyle}>

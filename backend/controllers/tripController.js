@@ -181,6 +181,35 @@ exports.deleteTrip = async (req, res) => {
     const { id } = req.params;
 
     const trip = await prisma.trip.findFirst({
+      where: { id, userId }
+    });
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found or unauthorized.' });
+    }
+
+    await prisma.trip.delete({
+      where: { id }
+    });
+
+    return res.json({ message: 'Trip deleted successfully' });
+
+  } catch (error) {
+    console.error('Delete trip error:', error);
+    return res.status(500).json({ error: 'Internal server error deleting trip.' });
+  }
+};
+
+/**
+ * GET /api/trips/:id
+ * Get trip details by ID
+ */
+exports.getTripById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const trip = await prisma.trip.findFirst({
       where: { id, userId },
     });
 
@@ -268,7 +297,10 @@ exports.deleteTripStop = async (req, res) => {
       return res.status(404).json({ error: 'Trip not found or unauthorized.' });
     }
 
-    await prisma.tripStop.delete({ where: { id: stopId } });
+    await prisma.tripStop.delete({
+      where: { id: stopId }
+    });
+
     return res.json({ message: 'Stop removed from itinerary.' });
   } catch (error) {
     console.error('Error deleting trip stop:', error);
