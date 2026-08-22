@@ -21,4 +21,7 @@ router.delete('/:id', tripController.deleteTrip);
 router.post('/:id/stops', tripController.addTripStop);
 router.delete('/:id/stops/:stopId', tripController.deleteTripStop);
 
+// Itinerary regeneration route
+router.post('/:id/regenerate-itinerary', tripController.regenerateItinerary);
+
 module.exports = router;
