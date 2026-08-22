@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -32,12 +30,18 @@ model User {
 }
 
 model City {
-  id        String     @id @default(uuid())
-  name      String
-  country   String
-  region    String
-  image     String?
-  tripStops TripStop[]
+  id          String     @id @default(uuid())
+  name        String
+  country     String
+  region      String
+  image       String?
+  description String?
+  popularity  Float?
+  latitude    Float?
+  longitude   Float?
+  costIndex   Int?
+  tripStops   TripStop[]
+  activities  Activity[]
 
   @@index([country])
   @@index([region])
@@ -45,17 +49,18 @@ model City {
 }
 
 model Trip {
-  id          String     @id @default(uuid())
-  userId      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  coverImage  String?
-  tripStops   TripStop[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id             String         @id @default(uuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime
+  coverImage     String?
+  tripStops      TripStop[]
+  tripActivities TripActivity[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@index([userId])
   @@index([userId, startDate])
@@ -63,14 +68,56 @@ model Trip {
 }
 
 model TripStop {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   tripId    String
-  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip      Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
   cityId    String
-  city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  city      City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  sequence  Int?
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([tripId])
   @@index([cityId])
+}
+
+model Activity {
+  id             String         @id @default(uuid())
+  name           String?
+  title          String         @default("Activity")
+  description    String         @default("Activity details")
+  type           String?
+  category       String         @default("Sightseeing") // Sightseeing, Food & Dining, Adventure, Culture, Shopping, Relaxation
+  cost           Float?
+  costType       String         @default("Free")        // Free, $, $$, $$$
+  costAmount     Float          @default(0.0)
+  duration       String         @default("Half Day")    // 1-2 Hours, Half Day, Full Day
+  rating         Float          @default(4.8)
+  popularity     Float          @default(90.0)
+  image          String?
+  cityId         String?
+  city           City?          @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  cityName       String?
+  tripActivities TripActivity[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([category])
+  @@index([costType])
+  @@index([cityName])
+}
+
+model TripActivity {
+  id         String   @id @default(uuid())
+  tripId     String
+  trip       Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  cityId     String?
+  createdAt  DateTime @default(now())
+
+  @@index([tripId])
+  @@index([activityId])
 }

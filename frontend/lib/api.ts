@@ -295,4 +295,67 @@ export const tripApi = {
     apiFetch<{ cities: City[] }>("/api/trips/cities"),
 };
 
+// ── Activity API (Screen 8) ───────────────────────
+export interface ActivityItem {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  costType: string;
+  costAmount: number;
+  duration: string;
+  rating: number;
+  popularity: number;
+  image?: string | null;
+  cityId?: string | null;
+  cityName?: string | null;
+  createdAt?: string;
+}
+
+export interface TripActivityItem {
+  id: string;
+  tripId: string;
+  activityId: string;
+  cityId?: string | null;
+  activity: ActivityItem;
+  createdAt: string;
+}
+
+export const activityApi = {
+  getActivities: (params?: {
+    search?: string;
+    city?: string;
+    category?: string;
+    costType?: string;
+    duration?: string;
+    sortBy?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const qStr = query.toString();
+    return apiFetch<{ activities: ActivityItem[] }>(`/api/activities${qStr ? `?${qStr}` : ""}`);
+  },
+
+  addActivityToTrip: (payload: { tripId: string; activityId: string; cityId?: string }) =>
+    apiFetch<{ message: string; tripActivity: TripActivityItem }>("/api/activities/trip", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  removeActivityFromTrip: (tripActivityId: string) =>
+    apiFetch<{ message: string }>(`/api/activities/trip/${tripActivityId}`, {
+      method: "DELETE",
+    }),
+
+  getTripActivities: (tripId: string) =>
+    apiFetch<{ tripActivities: TripActivityItem[] }>(`/api/activities/trip/${tripId}`),
+};
+
+
 

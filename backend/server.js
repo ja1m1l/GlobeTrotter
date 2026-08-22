@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const tripRoutes = require('./routes/tripRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 const prisma = require('./utils/prisma');
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/activities', activityRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
