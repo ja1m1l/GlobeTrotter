@@ -121,31 +121,36 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
+    const identifier = (username || email || '').trim();
 
     // Validate required fields
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required.' });
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Username or email and password are required.' });
     }
 
-    // Find user by username (or email as fallback)
+    // Find user by username or email
     const user = await prisma.user.findFirst({
       where: {
         OR: [
-          { username: username.toLowerCase() },
-          { email: username.toLowerCase() }
+          { username: identifier.toLowerCase() },
+          { email: identifier.toLowerCase() }
         ]
       }
     });
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid username/email or password.' });
+      return res.status(401).json({ error: 'Invalid email/username or password.' });
+    }
+
+    if (user.status === 'Disabled') {
+      return res.status(403).json({ error: 'Account has been disabled by system administrator.' });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid username/email or password.' });
+      return res.status(401).json({ error: 'Invalid email/username or password.' });
     }
 
     // Generate token
@@ -158,6 +163,8 @@ exports.login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        role: user.role || 'USER',
+        status: user.status || 'Active',
         photoUrl: user.photoUrl,
         firstName: user.firstName,
         lastName: user.lastName,
