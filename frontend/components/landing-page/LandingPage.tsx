@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { clearAuth, getUser, authApi, User } from "@/lib/api";
 
 interface Trip {
@@ -106,11 +107,18 @@ export default function LandingPage() {
         {/* left space — GlobeTrotter is in layout fixed header */}
         <div />
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* User avatar */}
-          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
-            {user?.firstName?.[0]?.toUpperCase() ?? "U"}
-          </div>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>{user?.firstName ?? "Traveler"}</span>
+          <Link href="/profile" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: "inherit" }}>
+            {/* User avatar */}
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
+              {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+            </div>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", fontWeight: 500 }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
+            >
+              {user?.firstName ?? "Traveler"}
+            </span>
+          </Link>
           <button onClick={handleLogout} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s" }}
             onMouseEnter={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.5)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
@@ -211,10 +219,18 @@ export default function LandingPage() {
 
         {/* ── Trips Grid ── */}
         <section>
-          <SectionTitle>
-            {selectedFilter === "all" ? "All Trips" : selectedFilter === "completed" ? "Completed Trips" : selectedFilter === "upcoming" ? "Upcoming Trips" : "Draft Trips"}
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: 400, marginLeft: 8 }}>({filteredTrips.length})</span>
-          </SectionTitle>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.85)", letterSpacing: "0.01em", margin: 0 }}>
+              {selectedFilter === "all" ? "All Trips" : selectedFilter === "completed" ? "Completed Trips" : selectedFilter === "upcoming" ? "Upcoming Trips" : "Draft Trips"}
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: 400, marginLeft: 8 }}>({filteredTrips.length})</span>
+            </h2>
+            <Link href="/trips" style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 600, textDecoration: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#14b8a6"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            >
+              View Detailed Listing →
+            </Link>
+          </div>
           {filteredTrips.length === 0 ? (
             <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>🗺️</div>

@@ -140,4 +140,117 @@ export const authApi = {
       method: "POST",
       body: JSON.stringify({ token, newPassword }),
     }),
+
+  updateProfile: (payload: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    photoUrl?: string;
+    phoneNumber?: string;
+    city?: string;
+    country?: string;
+    additionalInfo?: string;
+  }) =>
+    apiFetch<{ message: string; user: User }>("/api/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+};
+
+// ── Dashboard API ──────────────────────────────────
+export interface TripData {
+  id: string;
+  name: string;
+  description?: string | null;
+  startDate: string;
+  endDate: string;
+  coverImage?: string | null;
+  destinationCount: number;
+  status: "completed" | "upcoming" | "ongoing";
+  createdAt: string;
+}
+
+export interface DashboardResponse {
+  success: boolean;
+  message: string;
+  data: {
+    topRegionalSelections: any[];
+    previousTrips: TripData[];
+    pagination: {
+      previousTrips: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+      };
+    };
+  };
+}
+
+export const dashboardApi = {
+  getDashboard: () =>
+    apiFetch<DashboardResponse>("/api/dashboard"),
+
+  getPreviousTrips: (params?: {
+    search?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null) {
+          query.set(key, String(val));
+        }
+      });
+    }
+    const queryString = query.toString();
+    return apiFetch<{
+      success: boolean;
+      message: string;
+      data: TripData[];
+      pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+      };
+    }>(`/api/dashboard/previous-trips${queryString ? `?${queryString}` : ""}`);
+  },
+};
+
+// ── Trips API ──────────────────────────────────────
+export interface CreateTripPayload {
+  name: string;
+  description?: string;
+  startDate?: string;
+  endDate?: string;
+  coverImage?: string;
+  cityId?: string;
+}
+
+export const tripApi = {
+  create: (payload: CreateTripPayload) =>
+    apiFetch<{ message: string; trip: any }>("/api/trips", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  update: (id: string, payload: Partial<CreateTripPayload>) =>
+    apiFetch<{ message: string; trip: any }>(`/api/trips/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/api/trips/${id}`, {
+      method: "DELETE",
+    }),
 };

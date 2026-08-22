@@ -301,3 +301,92 @@ exports.resetPassword = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error during password reset.' });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const {
+      email,
+      firstName,
+      lastName,
+      photoUrl,
+      phoneNumber,
+      city,
+      country,
+      additionalInfo
+    } = req.body;
+
+    const dataToUpdate = {};
+
+    // Get current user to compare
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    if (email && email.toLowerCase() !== currentUser.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Invalid email format.' });
+      }
+
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() }
+      });
+      if (existingEmail) {
+        return res.status(400).json({ error: 'Email is already taken.' });
+      }
+      dataToUpdate.email = email.toLowerCase();
+    }
+
+    if (firstName !== undefined) {
+      if (!firstName.trim()) {
+        return res.status(400).json({ error: 'First name cannot be empty.' });
+      }
+      dataToUpdate.firstName = firstName;
+    }
+
+    if (lastName !== undefined) {
+      if (!lastName.trim()) {
+        return res.status(400).json({ error: 'Last name cannot be empty.' });
+      }
+      dataToUpdate.lastName = lastName;
+    }
+
+    if (photoUrl !== undefined) dataToUpdate.photoUrl = photoUrl;
+    if (phoneNumber !== undefined) dataToUpdate.phoneNumber = phoneNumber;
+    if (city !== undefined) dataToUpdate.city = city;
+    if (country !== undefined) dataToUpdate.country = country;
+    if (additionalInfo !== undefined) dataToUpdate.additionalInfo = additionalInfo;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: dataToUpdate
+    });
+
+    return res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        photoUrl: updatedUser.photoUrl,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        phoneNumber: updatedUser.phoneNumber,
+        city: updatedUser.city,
+        country: updatedUser.country,
+        additionalInfo: updatedUser.additionalInfo,
+        createdAt: updatedUser.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ error: 'Internal server error updating profile.' });
+  }
+};
+
