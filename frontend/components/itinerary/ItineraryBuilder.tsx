@@ -148,11 +148,8 @@ export default function ItineraryBuilder() {
         {/* Title Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <span style={{ fontSize: 11, color: "#2dd4bf", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Screen 5
-            </span>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: "#fff", marginTop: 2 }}>
-              Build Itinerary Screen
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: "#fff" }}>
+              Build Itinerary
             </h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
               {trip?.name || "My Planned Trip"} • {startDateFormatted} – {endDateFormatted}

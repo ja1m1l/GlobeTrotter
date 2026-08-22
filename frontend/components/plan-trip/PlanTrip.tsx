@@ -139,7 +139,7 @@ export default function PlanTrip() {
         {/* Title */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Plan a new trip (Screen 4)</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Plan a new trip</h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Enter trip details to build your custom itinerary</p>
           </div>
           <button onClick={() => router.push("/")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
