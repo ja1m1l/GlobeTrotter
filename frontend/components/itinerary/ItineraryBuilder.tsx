@@ -169,13 +169,13 @@ export default function ItineraryBuilder() {
               onClick={() => router.push(`/trip-budget/${tripId}`)}
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(45,212,191,0.3)", borderRadius: 10, padding: "10px 16px", color: "#2dd4bf", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}
             >
-              💰 Trip Budget (Screen 9)
+              💰 Trip Budget
             </button>
             <button
               onClick={() => router.push(`/activity-search?tripId=${tripId}`)}
               style={{ background: "linear-gradient(135deg,#14b8a6 0%,#0d9488 100%)", border: "none", borderRadius: 10, padding: "10px 18px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 16px rgba(20,184,166,0.3)" }}
             >
-              🔍 Search Activities (Screen 8)
+              🔍 Search Activities
             </button>
             <button onClick={() => router.push("/plan-trip")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
               ← Trip Form
