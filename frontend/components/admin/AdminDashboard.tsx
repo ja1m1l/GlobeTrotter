@@ -70,7 +70,7 @@ export default function AdminDashboard() {
 
   const handleAdminLogout = () => {
     removeToken();
-    router.push("/admin/login");
+    router.push("/login");
   };
 
   // Filtered Users List
@@ -95,7 +95,7 @@ export default function AdminDashboard() {
             Admin Dashboard is restricted to system administrators only. Please sign in with an Admin account.
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <button onClick={() => router.push("/admin/login")} style={{ padding: "10px 18px", background: "#ef4444", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={() => router.push("/login")} style={{ padding: "10px 18px", background: "#ef4444", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
               Sign In as Admin
             </button>
             <button onClick={() => router.push("/")} style={{ padding: "10px 18px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, color: "#fff", fontSize: 13, cursor: "pointer" }}>
@@ -117,20 +117,23 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#07090c", color: "#fff", fontFamily: "'Inter', system-ui, sans-serif", paddingBottom: 100 }}>
-      {/* Background Orbs */}
+      {/* Background Glow Orbs */}
       <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(239,68,68,0.06) 0%,transparent 70%)", top: "-15%", right: "-10%", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,rgba(20,184,166,0.05) 0%,transparent 70%)", bottom: "-15%", left: "-10%", pointerEvents: "none", zIndex: 0 }} />
 
       {/* Header Bar */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>GlobeTrotter</span>
+          <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
+            GlobeTrotter
+          </button>
           <span style={{ fontSize: 11, fontWeight: 800, color: "#f87171", background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", padding: "2px 8px", borderRadius: 6 }}>
             🔒 ADMIN PANEL
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
-            Admin: <strong>{currentUser?.firstName ?? "System"}</strong>
+            Admin: <strong style={{ color: "#fff" }}>{currentUser?.firstName ?? "System"}</strong>
           </span>
           <button onClick={handleAdminLogout} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer" }}>
             Sign out
@@ -183,10 +186,10 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab(tab.id as any)}
               style={{
                 padding: "12px 14px",
-                background: activeTab === tab.id ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.03)",
-                border: `1px solid ${activeTab === tab.id ? "rgba(239,68,68,0.4)" : "rgba(255,255,255,0.08)"}`,
+                background: activeTab === tab.id ? "rgba(45,212,191,0.15)" : "rgba(255,255,255,0.03)",
+                border: `1px solid ${activeTab === tab.id ? "rgba(45,212,191,0.4)" : "rgba(255,255,255,0.08)"}`,
                 borderRadius: 12,
-                color: activeTab === tab.id ? "#f87171" : "rgba(255,255,255,0.7)",
+                color: activeTab === tab.id ? "#2dd4bf" : "rgba(255,255,255,0.7)",
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: "pointer",
@@ -199,15 +202,15 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Central White Analytics & Charts Container (EXACT MATCH FOR WIREFRAME CENTRAL CARD) */}
-        <div style={{ background: "#ffffff", borderRadius: 24, color: "#111827", padding: "28px 24px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", display: "flex", flexDirection: "column", gap: 28 }}>
+        {/* Central Dark Analytics & Charts Container (MATCHES USER UI SLEEK DARK THEME) */}
+        <div style={{ ...cardStyle, padding: "28px 24px", display: "flex", flexDirection: "column", gap: 28 }}>
           {/* TAB 1: 👥 Manage Users */}
           {activeTab === "users" && (
             <div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
                 <div>
-                  <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: 0 }}>Registered Users ({filteredUsers.length})</h2>
-                  <p style={{ fontSize: 12, color: "#6b7280", margin: "2px 0 0" }}>Manage platform access, active status & account security</p>
+                  <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", margin: 0 }}>Registered Users ({filteredUsers.length})</h2>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "2px 0 0" }}>Manage platform access, active status & account security</p>
                 </div>
               </div>
 
@@ -215,7 +218,7 @@ export default function AdminDashboard() {
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                   <thead>
-                    <tr style={{ borderBottom: "2px solid #e5e7eb", textAlign: "left", color: "#4b5563" }}>
+                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "rgba(255,255,255,0.5)" }}>
                       <th style={{ padding: "10px 12px" }}>User</th>
                       <th style={{ padding: "10px 12px" }}>Email</th>
                       <th style={{ padding: "10px 12px" }}>Role</th>
@@ -226,19 +229,19 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {filteredUsers.map((u) => (
-                      <tr key={u.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                        <td style={{ padding: "12px", fontWeight: 700, color: "#111827" }}>
+                      <tr key={u.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                        <td style={{ padding: "12px", fontWeight: 700, color: "#fff" }}>
                           {u.firstName} {u.lastName}
                         </td>
-                        <td style={{ padding: "12px", color: "#4b5563" }}>{u.email}</td>
+                        <td style={{ padding: "12px", color: "rgba(255,255,255,0.6)" }}>{u.email}</td>
                         <td style={{ padding: "12px" }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, background: u.role === "ADMIN" ? "#fee2e2" : "#f3f4f6", color: u.role === "ADMIN" ? "#dc2626" : "#374151", padding: "2px 8px", borderRadius: 6 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, background: u.role === "ADMIN" ? "rgba(239,68,68,0.2)" : "rgba(255,255,255,0.06)", color: u.role === "ADMIN" ? "#f87171" : "rgba(255,255,255,0.7)", padding: "2px 8px", borderRadius: 6 }}>
                             {u.role}
                           </span>
                         </td>
-                        <td style={{ padding: "12px", fontWeight: 700, color: "#111827" }}>{u._count?.trips ?? 2} Trips</td>
+                        <td style={{ padding: "12px", fontWeight: 700, color: "#2dd4bf" }}>{u._count?.trips ?? 2} Trips</td>
                         <td style={{ padding: "12px" }}>
-                          <span style={{ fontSize: 11, fontWeight: 700, background: u.status === "Active" ? "#d1fae5" : "#fee2e2", color: u.status === "Active" ? "#059669" : "#dc2626", padding: "2px 8px", borderRadius: 6 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, background: u.status === "Active" ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)", color: u.status === "Active" ? "#34d399" : "#f87171", padding: "2px 8px", borderRadius: 6 }}>
                             {u.status}
                           </span>
                         </td>
@@ -246,14 +249,14 @@ export default function AdminDashboard() {
                           <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
                             <button
                               onClick={() => handleToggleUserStatus(u.id, u.status)}
-                              style={{ background: u.status === "Active" ? "#fef3c7" : "#d1fae5", border: "none", borderRadius: 6, padding: "5px 10px", color: u.status === "Active" ? "#d97706" : "#059669", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+                              style={{ background: u.status === "Active" ? "rgba(245,158,11,0.15)" : "rgba(16,185,129,0.15)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "5px 10px", color: u.status === "Active" ? "#fbbf24" : "#34d399", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
                             >
                               {u.status === "Active" ? "Disable" : "Activate"}
                             </button>
                             {u.role !== "ADMIN" && (
                               <button
                                 onClick={() => handleDeleteUser(u.id)}
-                                style={{ background: "#fee2e2", border: "none", borderRadius: 6, padding: "5px 10px", color: "#dc2626", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+                                style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 6, padding: "5px 10px", color: "#f87171", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
                               >
                                 Delete
                               </button>
@@ -271,19 +274,19 @@ export default function AdminDashboard() {
           {/* TAB 2: 🌍 Popular Cities */}
           {activeTab === "cities" && (
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111827", marginBottom: 4 }}>Popular Visited Destinations & Cities</h2>
-              <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 18 }}>Ranked by total trip selections across platform users</p>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Popular Visited Destinations & Cities</h2>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 18 }}>Ranked by total trip selections across platform users</p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {(analytics?.popularCities || []).map((city, idx) => (
-                  <div key={city.id || idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 18px" }}>
+                  <div key={city.id || idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 18px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#14b8a6", color: "#fff", fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         #{idx + 1}
                       </div>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: "#111827" }}>{city.name}</span>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{city.name}</span>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#0d9488" }}>{city.tripsCount} Trips</span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: "#2dd4bf" }}>{city.tripsCount} Trips</span>
                   </div>
                 ))}
               </div>
@@ -293,15 +296,15 @@ export default function AdminDashboard() {
           {/* TAB 3: 🎯 Popular Activities */}
           {activeTab === "activities" && (
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#111827", marginBottom: 4 }}>Top Booked & Tagged Activities</h2>
-              <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 18 }}>Popular activity trends selected by travelers</p>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 4 }}>Top Booked & Tagged Activities</h2>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 18 }}>Popular activity trends selected by travelers</p>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {(analytics?.popularActivities || []).map((act, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 18px" }}>
+                  <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 18px" }}>
                     <div>
-                      <h4 style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: 0 }}>{act.name}</h4>
-                      <span style={{ fontSize: 11, color: "#6b7280" }}>{act.category}</span>
+                      <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", margin: 0 }}>{act.name}</h4>
+                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{act.category}</span>
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 800, color: "#3b82f6" }}>{act.count} Selections</span>
                   </div>
@@ -315,31 +318,31 @@ export default function AdminDashboard() {
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               {/* Top Overview KPI Cards */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 14 }}>
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 16, padding: "16px 18px" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase" }}>TOTAL USERS</span>
-                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#111827", margin: "2px 0 0" }}>{(analytics?.totalUsers || 1250).toLocaleString()}</h3>
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>TOTAL USERS</span>
+                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "2px 0 0" }}>{(analytics?.totalUsers || 1250).toLocaleString()}</h3>
                 </div>
 
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 16, padding: "16px 18px" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#059669", textTransform: "uppercase" }}>ACTIVE USERS</span>
-                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#059669", margin: "2px 0 0" }}>{(analytics?.activeUsers || 840).toLocaleString()}</h3>
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#34d399", textTransform: "uppercase" }}>ACTIVE USERS</span>
+                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#34d399", margin: "2px 0 0" }}>{(analytics?.activeUsers || 840).toLocaleString()}</h3>
                 </div>
 
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 16, padding: "16px 18px" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", textTransform: "uppercase" }}>TOTAL TRIPS</span>
-                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#2563eb", margin: "2px 0 0" }}>{(analytics?.totalTrips || 3420).toLocaleString()}</h3>
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#60a5fa", textTransform: "uppercase" }}>TOTAL TRIPS</span>
+                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#60a5fa", margin: "2px 0 0" }}>{(analytics?.totalTrips || 3420).toLocaleString()}</h3>
                 </div>
 
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 16, padding: "16px 18px" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase" }}>COMMUNITY POSTS</span>
-                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#7c3aed", margin: "2px 0 0" }}>{(analytics?.totalCommunityPosts || 88).toLocaleString()}</h3>
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: "16px 18px" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", textTransform: "uppercase" }}>COMMUNITY POSTS</span>
+                  <h3 style={{ fontSize: 28, fontWeight: 800, color: "#a78bfa", margin: "2px 0 0" }}>{(analytics?.totalCommunityPosts || 88).toLocaleString()}</h3>
                 </div>
               </div>
 
               {/* Wireframe Line Chart: Trips Over Time */}
-              <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 18, padding: 20 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 14 }}>📈 Trips & User Growth Over Time</h3>
-                <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 18, padding: "0 10px 10px", borderBottom: "2px solid #9ca3af", borderLeft: "2px solid #9ca3af" }}>
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
+                <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 14 }}>📈 Trips & User Growth Over Time</h3>
+                <div style={{ height: 180, display: "flex", alignItems: "flex-end", gap: 18, padding: "0 10px 10px", borderBottom: "1px solid rgba(255,255,255,0.1)", borderLeft: "1px solid rgba(255,255,255,0.1)" }}>
                   {(analytics?.tripTrends || []).map((t) => {
                     const heightPct = Math.min(100, Math.round((t.trips / 2000) * 100));
                     return (
@@ -348,13 +351,13 @@ export default function AdminDashboard() {
                           style={{
                             width: "75%",
                             height: `${heightPct}%`,
-                            background: "linear-gradient(180deg, #ef4444 0%, #f87171 100%)",
+                            background: "linear-gradient(180deg, #2dd4bf 0%, #14b8a6 100%)",
                             borderRadius: "6px 6px 0 0",
                             transition: "height 0.4s ease",
                           }}
                           title={`${t.trips} trips`}
                         />
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#4b5563" }}>{t.month}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.5)" }}>{t.month}</span>
                       </div>
                     );
                   })}
@@ -363,39 +366,39 @@ export default function AdminDashboard() {
 
               {/* Wireframe Pie Chart & Region Share */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 18, padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#111827", margin: 0 }}>🥧 Destination Region Share</h3>
-                  <div style={{ width: "100%", height: 16, borderRadius: 8, background: "#e5e7eb", display: "flex", overflow: "hidden" }}>
+                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", margin: 0 }}>🥧 Destination Region Share</h3>
+                  <div style={{ width: "100%", height: 16, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", overflow: "hidden" }}>
                     {(analytics?.regionDistribution || []).map((r) => (
                       <div key={r.region} style={{ width: `${r.percentage}%`, background: r.color }} title={r.region} />
                     ))}
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: "#4b5563" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.6)" }}>
                     {(analytics?.regionDistribution || []).map((r) => (
                       <div key={r.region} style={{ display: "flex", justifyContent: "space-between" }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <span style={{ width: 10, height: 10, borderRadius: "50%", background: r.color }} /> {r.region}
                         </span>
-                        <strong>{r.percentage}%</strong>
+                        <strong style={{ color: "#fff" }}>{r.percentage}%</strong>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 18, padding: 20 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#111827", marginBottom: 12 }}>⚡ System Performance</h3>
+                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 12 }}>⚡ System Performance</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13 }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "#6b7280" }}>Database Latency</span>
-                      <strong style={{ color: "#059669" }}>18 ms (Neon PostgreSQL)</strong>
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Database Latency</span>
+                      <strong style={{ color: "#34d399" }}>18 ms (Neon PostgreSQL)</strong>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "#6b7280" }}>API Response Time</span>
-                      <strong style={{ color: "#059669" }}>42 ms</strong>
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>API Response Time</span>
+                      <strong style={{ color: "#34d399" }}>42 ms</strong>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "#6b7280" }}>Uptime</span>
-                      <strong style={{ color: "#2563eb" }}>99.98%</strong>
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Uptime</span>
+                      <strong style={{ color: "#60a5fa" }}>99.98%</strong>
                     </div>
                   </div>
                 </div>
