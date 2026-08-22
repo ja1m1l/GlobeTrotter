@@ -258,7 +258,7 @@ export default function TripsPage() {
       {isModalOpen && (
         <div style={modalOverlayStyle} onClick={(e) => e.target === e.currentTarget && setIsModalOpen(false)}>
           <div style={modalCardStyle}>
-            <div style={{ display: "flex", alignItems: "center", justifySpace: "between", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
               <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>Plan a New Trip</h3>
               <button onClick={() => setIsModalOpen(false)} style={modalCloseButtonStyle}>×</button>
             </div>
@@ -330,7 +330,7 @@ function TripRowCard({ trip, onDelete }: { trip: TripData; onDelete: (e: React.M
         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>📅 {start} — {end}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <span style={badgeStyle(trip.status)}>{trip.status}</span>
+        <span style={badgeStyle(trip.status || "upcoming")}>{trip.status || "upcoming"}</span>
         <button onClick={onDelete} style={deleteButtonStyle}>
           🗑️
         </button>
@@ -339,7 +339,7 @@ function TripRowCard({ trip, onDelete }: { trip: TripData; onDelete: (e: React.M
   );
 }
 
-const badgeStyle = (status: string) => {
+const badgeStyle = (status: string = "upcoming") => {
   const colors: Record<string, { c: string; bg: string; b: string }> = {
     ongoing: { c: "#2dd4bf", bg: "rgba(45,212,191,0.1)", b: "rgba(45,212,191,0.25)" },
     upcoming: { c: "#f59e0b", bg: "rgba(245,158,11,0.1)", b: "rgba(245,158,11,0.25)" },

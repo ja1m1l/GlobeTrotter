@@ -157,7 +157,23 @@ export const authApi = {
     }),
 };
 
-// ── Dashboard API ──────────────────────────────────
+// ── Dashboard & Trip API Interfaces ───────────────
+export interface City {
+  id: string;
+  name: string;
+  country: string;
+  region: string;
+  image?: string | null;
+}
+
+export interface TripStop {
+  id: string;
+  tripId: string;
+  cityId: string;
+  city: City;
+  createdAt: string;
+}
+
 export interface TripData {
   id: string;
   name: string;
@@ -165,8 +181,9 @@ export interface TripData {
   startDate: string;
   endDate: string;
   coverImage?: string | null;
-  destinationCount: number;
-  status: "completed" | "upcoming" | "ongoing";
+  destinationCount?: number;
+  status?: "completed" | "upcoming" | "ongoing" | string;
+  tripStops?: TripStop[];
   createdAt: string;
 }
 
@@ -226,13 +243,13 @@ export const dashboardApi = {
   },
 };
 
-// ── Trips API ──────────────────────────────────────
 export interface CreateTripPayload {
   name: string;
-  description?: string;
   startDate?: string;
   endDate?: string;
+  description?: string;
   coverImage?: string;
+  location?: string;
   cityId?: string;
 }
 
@@ -242,6 +259,15 @@ export const tripApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+
+  createTrip: (payload: CreateTripPayload) =>
+    apiFetch<{ message: string; trip: TripData }>("/api/trips", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  getTripById: (id: string) =>
+    apiFetch<{ trip: TripData }>(`/api/trips/${id}`),
 
   update: (id: string, payload: Partial<CreateTripPayload>) =>
     apiFetch<{ message: string; trip: any }>(`/api/trips/${id}`, {
@@ -253,55 +279,6 @@ export const tripApi = {
     apiFetch<{ message: string }>(`/api/trips/${id}`, {
       method: "DELETE",
     }),
-};
-
-// ── Trip API ───────────────────────────────────────
-export interface City {
-  id: string;
-  name: string;
-  country: string;
-  region: string;
-  image?: string | null;
-}
-
-export interface TripStop {
-  id: string;
-  tripId: string;
-  cityId: string;
-  city: City;
-  createdAt: string;
-}
-
-export interface TripData {
-  id: string;
-  name: string;
-  description?: string | null;
-  startDate: string;
-  endDate: string;
-  coverImage?: string | null;
-  tripStops?: TripStop[];
-  createdAt: string;
-}
-
-export interface CreateTripPayload {
-  name: string;
-  startDate: string;
-  endDate: string;
-  description?: string;
-  coverImage?: string;
-  location?: string;
-  cityId?: string;
-}
-
-export const tripApi = {
-  createTrip: (payload: CreateTripPayload) =>
-    apiFetch<{ message: string; trip: TripData }>("/api/trips", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    }),
-
-  getTripById: (id: string) =>
-    apiFetch<{ trip: TripData }>(`/api/trips/${id}`),
 
   addTripStop: (tripId: string, payload: { cityId?: string; cityName?: string }) =>
     apiFetch<{ message: string; tripStop: TripStop }>(`/api/trips/${tripId}/stops`, {
@@ -317,4 +294,5 @@ export const tripApi = {
   getCities: () =>
     apiFetch<{ cities: City[] }>("/api/trips/cities"),
 };
+
 
