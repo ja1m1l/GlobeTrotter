@@ -1,13 +1,7 @@
 require('dotenv').config();
-const { PrismaClient } = require('./generated/prisma');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const { Pool } = require('pg');
+const prisma = require('./utils/prisma');
 const bcrypt = require('bcryptjs');
 
-const connectionString = process.env.DATABASE_URL;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 const seed = async () => {
   try {
@@ -66,6 +60,22 @@ const seed = async () => {
       data: { name: 'Mumbai', country: 'India', region: 'West India', image: 'https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=500' }
     });
 
+    const delhi = await prisma.city.create({
+      data: { name: 'Delhi', country: 'India', region: 'North India', image: 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=500' }
+    });
+
+    const jaipur = await prisma.city.create({
+      data: { name: 'Jaipur', country: 'India', region: 'North India', image: 'https://images.unsplash.com/photo-1477584322902-471a5db55b36?w=500' }
+    });
+
+    const agra = await prisma.city.create({
+      data: { name: 'Agra', country: 'India', region: 'North India', image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=500' }
+    });
+
+    const kerala = await prisma.city.create({
+      data: { name: 'Kerala', country: 'India', region: 'South India', image: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=500' }
+    });
+
     const paris = await prisma.city.create({
       data: { name: 'Paris', country: 'France', region: 'Western Europe', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500' }
     });
@@ -122,6 +132,32 @@ const seed = async () => {
     });
     await prisma.tripStop.create({ data: { tripId: tripC.id, cityId: dubai.id } });
 
+    // Trip D: Upcoming (Alex) - Jaipur Palace Route
+    const tripD = await prisma.trip.create({
+      data: {
+        userId: user1.id,
+        name: 'Jaipur Palace Expedition',
+        description: 'Jaipur, India',
+        startDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000), // 25 days from now
+        endDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000),
+        coverImage: 'https://images.unsplash.com/photo-1477584322902-471a5db55b36?w=500'
+      }
+    });
+    await prisma.tripStop.create({ data: { tripId: tripD.id, cityId: jaipur.id } });
+
+    // Trip E: Completed (Alex) - Kerala Houseboat Backwaters
+    const tripE = await prisma.trip.create({
+      data: {
+        userId: user1.id,
+        name: 'Kerala Backwaters Cruise',
+        description: 'Kerala, India',
+        startDate: new Date(now.getTime() - 40 * 24 * 60 * 60 * 1000), // 40 days ago
+        endDate: new Date(now.getTime() - 35 * 24 * 60 * 60 * 1000),
+        coverImage: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=500'
+      }
+    });
+    await prisma.tripStop.create({ data: { tripId: tripE.id, cityId: kerala.id } });
+
     // More upcoming trips for Alex to test pagination (need 6+ total)
     for (let i = 1; i <= 5; i++) {
       const extraTrip = await prisma.trip.create({
@@ -169,7 +205,6 @@ const seed = async () => {
     console.error('FAILURE: Error seeding database:', error);
   } finally {
     await prisma.$disconnect();
-    pool.end();
   }
 };
 

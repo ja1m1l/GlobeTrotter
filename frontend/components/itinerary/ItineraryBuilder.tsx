@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { tripApi, TripData } from "@/lib/api";
+import { tripApi, TripData, getUser, User } from "@/lib/api";
 
 interface ItinerarySection {
   id: string;
@@ -58,7 +58,10 @@ export default function ItineraryBuilder() {
   const [newEndDate, setNewEndDate] = useState("");
   const [newBudget, setNewBudget] = useState("");
 
+  const [user, setUser] = useState<User | null>(null);
+
   useEffect(() => {
+    setUser(getUser());
     if (!tripId) return;
 
     // Fetch trip details from backend
@@ -134,14 +137,20 @@ export default function ItineraryBuilder() {
       {/* Ambient background orb */}
       <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(20,184,166,0.06) 0%,transparent 70%)", top: "-15%", right: "-10%", pointerEvents: "none", zIndex: 0 }} />
 
-      {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-          GlobeTrotter
+        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </button>
-        <button onClick={() => router.push("/")} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
-          Dashboard
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(20,184,166,0.15)", border: "1.5px solid rgba(45,212,191,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#2dd4bf" }}>
+            {user?.firstName?.[0]?.toUpperCase() ?? "U"}
+          </div>
+        </div>
       </header>
 
       <main style={{ maxWidth: 860, margin: "0 auto", padding: "32px 20px", display: "flex", flexDirection: "column", gap: 24, position: "relative", zIndex: 1 }}>

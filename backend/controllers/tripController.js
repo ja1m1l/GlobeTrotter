@@ -28,6 +28,42 @@ exports.createTrip = async (req, res) => {
       return res.status(400).json({ error: 'End date cannot be earlier than start date.' });
     }
 
+    // Resolve cover image from City or Location name
+    let resolvedCoverImage = coverImage || null;
+    let matchingCity = null;
+
+    if (cityId) {
+      matchingCity = await prisma.city.findUnique({ where: { id: cityId } });
+    } else if (location) {
+      matchingCity = await prisma.city.findFirst({
+        where: { name: { equals: location.trim(), mode: 'insensitive' } }
+      });
+      if (!matchingCity) {
+        const cleanLoc = location.trim().split(',')[0].trim();
+        matchingCity = await prisma.city.findFirst({
+          where: { name: { equals: cleanLoc, mode: 'insensitive' } }
+        });
+      }
+    }
+
+    if (matchingCity && matchingCity.image) {
+      resolvedCoverImage = matchingCity.image;
+    } else if (location && !resolvedCoverImage) {
+      const kw = location.toLowerCase();
+      if (kw.includes("delhi")) resolvedCoverImage = "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=500";
+      else if (kw.includes("jaipur")) resolvedCoverImage = "https://images.unsplash.com/photo-1477584322902-471a5db55b36?w=500";
+      else if (kw.includes("agra")) resolvedCoverImage = "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=500";
+      else if (kw.includes("kerala")) resolvedCoverImage = "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=500";
+      else if (kw.includes("goa")) resolvedCoverImage = "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=500";
+      else if (kw.includes("mumbai")) resolvedCoverImage = "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=500";
+      else if (kw.includes("paris")) resolvedCoverImage = "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500";
+      else if (kw.includes("london")) resolvedCoverImage = "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=500";
+      else if (kw.includes("dubai")) resolvedCoverImage = "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500";
+      else if (kw.includes("tokyo")) resolvedCoverImage = "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=500";
+      else if (kw.includes("sydney")) resolvedCoverImage = "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=500";
+      else if (kw.includes("new york")) resolvedCoverImage = "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500";
+    }
+
     // Create trip in database
     const trip = await prisma.trip.create({
       data: {
@@ -36,7 +72,7 @@ exports.createTrip = async (req, res) => {
         description: description ? description.trim() : null,
         startDate: start,
         endDate: end,
-        coverImage: coverImage || null,
+        coverImage: resolvedCoverImage,
       },
     });
 
@@ -52,10 +88,6 @@ exports.createTrip = async (req, res) => {
         });
       }
     } else if (location) {
-      const matchingCity = await prisma.city.findFirst({
-        where: { name: { equals: location.trim(), mode: 'insensitive' } },
-      });
-
       if (matchingCity) {
         await prisma.tripStop.create({
           data: {
