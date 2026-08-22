@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, DollarSign, Plus, Search, Sparkles, Wand2, Share2 } from "lucide-react";
-import { tripApi, TripData, getUser, User, isAuthenticated } from "@/lib/api";
+import { tripApi, TripData, getUser, User, isAuthenticated, publicTripApi } from "@/lib/api";
 
 interface ItinerarySection {
   id: string;
@@ -49,8 +49,9 @@ export default function ItineraryBuilder() {
     setUser(getUser());
     if (!tripId) return;
 
-    tripApi
-      .getTripById(tripId)
+    const fetchFn = isAuthenticated() ? tripApi.getTripById : publicTripApi.getTripById;
+
+    fetchFn(tripId)
       .then((res) => {
         setTrip(res.trip);
         if (res.trip.itinerary) {

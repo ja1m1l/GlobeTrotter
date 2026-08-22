@@ -542,6 +542,36 @@ exports.getTripById = async (req, res) => {
 };
 
 /**
+ * GET /api/trips/:id/public
+ * Get trip details by ID without authentication (for sharing)
+ */
+exports.getPublicTripById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const trip = await prisma.trip.findUnique({
+      where: { id },
+      include: {
+        tripStops: {
+          include: { city: true },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found.' });
+    }
+
+    return res.json({ trip });
+  } catch (error) {
+    console.error('Error fetching public trip:', error);
+    return res.status(500).json({ error: 'Failed to fetch trip details.' });
+  }
+};
+
+
+/**
  * POST /api/trips/:id/stops
  * Add a stop/city to a trip itinerary
  */

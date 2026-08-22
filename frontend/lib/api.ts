@@ -134,6 +134,38 @@ async function apiFetch<T>(
   return data as T;
 }
 
+// ── Public fetch wrapper (no auth token) ──────────────
+async function publicFetch<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+
+  const contentType = res.headers.get("content-type") || "";
+  let data: any = null;
+
+  if (contentType.includes("application/json")) {
+    try { data = await res.json(); } catch (e) { /* ignore */ }
+  } else {
+    try {
+      const text = await res.text();
+      data = { error: text || res.statusText || "Request failed" };
+    } catch (e) { /* ignore */ }
+  }
+
+  if (!res.ok) {
+    const errMsg = data?.error || `Request failed with status ${res.status}`;
+    throw new Error(errMsg);
+  }
+
+  return data as T;
+}
+
 // ── Auth API ───────────────────────────────────────
 export interface LoginPayload {
   username?: string;
@@ -366,6 +398,12 @@ export const tripApi = {
     apiFetch<{ message: string; trip: TripData }>(`/api/trips/${tripId}/regenerate-itinerary`, {
       method: "POST",
     }),
+};
+
+// Public (unauthenticated) trip API — for shared links
+export const publicTripApi = {
+  getTripById: (id: string) =>
+    publicFetch<{ trip: TripData }>(`/api/trips/${id}/public`),
 };
 
 // Central helper to load all countries and their cities dynamically (with local caching)

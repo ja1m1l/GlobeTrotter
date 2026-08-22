@@ -16,7 +16,7 @@ import {
   UtensilsCrossed,
   Share2,
 } from "lucide-react";
-import { tripApi, activityApi, TripData, getUser, isAuthenticated } from "@/lib/api";
+import { tripApi, activityApi, TripData, getUser, isAuthenticated, publicTripApi } from "@/lib/api";
 
 interface ExpenseItem {
   id: string;
@@ -51,8 +51,8 @@ export default function TripBudget() {
   useEffect(() => {
     setUser(getUser());
     if (tripId) {
-      tripApi
-        .getTripById(tripId)
+      const fetchFn = isAuthenticated() ? tripApi.getTripById : publicTripApi.getTripById;
+      fetchFn(tripId)
         .then((res) => {
           setTrip(res.trip);
           if (res.trip.maxBudget) setTargetBudget(res.trip.maxBudget);

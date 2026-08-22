@@ -3,7 +3,10 @@ const router = express.Router();
 const tripController = require('../controllers/tripController');
 const authMiddleware = require('../middleware/auth');
 
-// All trip routes require authentication
+// Public route (no auth required) — must be registered BEFORE authMiddleware
+router.get('/:id/public', tripController.getPublicTripById);
+
+// All other trip routes require authentication
 router.use(authMiddleware);
 
 // Specific path routes FIRST
