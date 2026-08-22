@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   BarChart3,
-  Gauge,
   Globe2,
   PieChart,
   Search,
@@ -408,24 +407,6 @@ export default function AdminDashboard() {
                         <strong style={{ color: "#fff" }}>{r.percentage}%</strong>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 18, padding: 20 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 12, display: "inline-flex", alignItems: "center", gap: 8 }}><Gauge size={15} strokeWidth={2} /> System Performance</h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Database Latency</span>
-                      <strong style={{ color: "#34d399" }}>18 ms (Neon PostgreSQL)</strong>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>API Response Time</span>
-                      <strong style={{ color: "#34d399" }}>42 ms</strong>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Uptime</span>
-                      <strong style={{ color: "#60a5fa" }}>99.98%</strong>
-                    </div>
                   </div>
                 </div>
               </div>
