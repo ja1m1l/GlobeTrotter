@@ -8,11 +8,22 @@ const prisma = require('./utils/prisma');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS
-app.use(cors());
+// ── CORS — allow all origins (dev mode) ──────────────
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: false,
+};
 
-// Parse JSON request bodies
-app.use(express.json());
+app.use(cors(corsOptions));
+
+// Handle preflight for all routes
+app.options('/{*path}', cors(corsOptions));
+
+// Parse JSON request bodies (increased limit to support base64 profile photos)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
