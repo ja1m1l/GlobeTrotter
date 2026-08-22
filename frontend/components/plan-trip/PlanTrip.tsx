@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, tripApi, City } from "@/lib/api";
+import { getUser, tripApi, City, getGlobalCountriesAndCities } from "@/lib/api";
 
 const SUGGESTIONS = [
   {
@@ -54,7 +54,9 @@ export default function PlanTrip() {
   const [user, setUser] = useState<{ firstName?: string } | null>(null);
 
   const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
+  const [countriesCities, setCountriesCities] = useState<Record<string, string[]>>({});
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [description, setDescription] = useState("");
@@ -67,6 +69,9 @@ export default function PlanTrip() {
 
   useEffect(() => {
     setUser(getUser());
+    getGlobalCountriesAndCities().then((data) => {
+      setCountriesCities(data);
+    });
     // Load available cities from DB
     tripApi
       .getCities()
@@ -76,7 +81,13 @@ export default function PlanTrip() {
 
   const handleSelectSuggestion = (s: typeof SUGGESTIONS[0]) => {
     setSelectedSuggestion(s.id);
-    if (!location) setLocation(s.location);
+    if (s.location && s.location.includes(",")) {
+      const parts = s.location.split(",");
+      const cityPart = parts[0].trim();
+      const countryPart = parts[1].trim();
+      setSelectedCountry(countryPart);
+      setSelectedCity(cityPart);
+    }
     if (!description) setDescription(`Selected Activity: ${s.title}. ${s.description}`);
   };
 
@@ -109,7 +120,7 @@ export default function PlanTrip() {
         endDate,
         description: description.trim() || undefined,
         coverImage: coverImage.trim() || undefined,
-        location: location.trim() || undefined,
+        location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : undefined,
       });
 
       // Move directly to Itinerary Builder (Screen 5)
@@ -175,24 +186,46 @@ export default function PlanTrip() {
             />
           </div>
 
-          {/* Select a Place / Location */}
-          <div>
-            <label style={labelStyle}>Select a Place / Destination</label>
-            <input
-              type="text"
-              placeholder="e.g. Paris, France or Tokyo, Japan"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              list="city-suggestions"
-              style={inputStyle}
-            />
-            {cities.length > 0 && (
-              <datalist id="city-suggestions">
-                {cities.map((c) => (
-                  <option key={c.id} value={`${c.name}, ${c.country}`} />
+          {/* Country & City Dropdowns */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div>
+              <label style={labelStyle}>Country <span style={{ color: "#2dd4bf" }}>*</span></label>
+              <select
+                value={selectedCountry}
+                onChange={(e) => {
+                  setSelectedCountry(e.target.value);
+                  setSelectedCity(""); // reset city when country changes
+                }}
+                required
+                style={{ ...inputStyle, background: "#0d1014" }}
+              >
+                <option value="" style={{ background: "#0d1014" }}>Select Country</option>
+                {Object.keys(countriesCities).map((c) => (
+                  <option key={c} value={c} style={{ background: "#0d1014" }}>{c}</option>
                 ))}
-              </datalist>
-            )}
+              </select>
+            </div>
+
+            <div>
+              <label style={labelStyle}>City <span style={{ color: "#2dd4bf" }}>*</span></label>
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                required
+                disabled={!selectedCountry}
+                style={{
+                  ...inputStyle,
+                  background: "#0d1014",
+                  opacity: selectedCountry ? 1 : 0.6,
+                  cursor: selectedCountry ? "pointer" : "not-allowed"
+                }}
+              >
+                <option value="" style={{ background: "#0d1014" }}>Select City</option>
+                {selectedCountry && countriesCities[selectedCountry]?.map((city) => (
+                  <option key={city} value={city} style={{ background: "#0d1014" }}>{city}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Start Date & End Date Grid */}

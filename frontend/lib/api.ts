@@ -298,6 +298,43 @@ export const tripApi = {
     apiFetch<{ cities: City[] }>("/api/trips/cities"),
 };
 
+// Central helper to load all countries and their cities dynamically (with local caching)
+export const getGlobalCountriesAndCities = async (): Promise<Record<string, string[]>> => {
+  const FALLBACK_LIST: Record<string, string[]> = {
+    "India": ["Goa", "Mumbai", "Delhi", "Jaipur", "Agra", "Kerala"],
+    "France": ["Paris"],
+    "UAE": ["Dubai"],
+    "UK": ["London"],
+    "Japan": ["Tokyo"],
+    "USA": ["New York"],
+    "Switzerland": ["Zurich"],
+    "Italy": ["Rome"],
+    "Indonesia": ["Bali"]
+  };
+
+  if (typeof window === "undefined") return FALLBACK_LIST;
+
+  try {
+    const cached = localStorage.getItem("gt_countries_cities");
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    const res = await fetch("https://countriesnow.space/api/v0.1/countries");
+    const json = await res.json();
+    if (json && !json.error && json.data) {
+      const mapped: Record<string, string[]> = {};
+      json.data.forEach((item: any) => {
+        mapped[item.country] = item.cities || [];
+      });
+      localStorage.setItem("gt_countries_cities", JSON.stringify(mapped));
+      return mapped;
+    }
+  } catch (err) {
+    console.error("Failed to load dynamic countries/cities, using fallback:", err);
+  }
+  return FALLBACK_LIST;
+};
+
 // ── Activity API (Screen 8) ───────────────────────
 export interface ActivityItem {
   id: string;
