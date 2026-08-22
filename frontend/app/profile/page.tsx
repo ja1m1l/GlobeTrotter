@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User } from "@/lib/api";
+import { isAuthenticated, clearAuth, getUser, setUser, authApi, dashboardApi, TripData, User, getGlobalCountriesAndCities } from "@/lib/api";
 
 const REGION_IMAGES: Record<string, string> = {
   Europe: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&auto=format&fit=crop",
@@ -12,6 +12,7 @@ const REGION_IMAGES: Record<string, string> = {
   Africa: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400&auto=format&fit=crop",
   Oceania: "https://images.unsplash.com/photo-1524820197278-540916411e20?w=400&auto=format&fit=crop",
 };
+
 
 const DEFAULT_TRAVEL_IMG = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop";
 
@@ -36,11 +37,16 @@ export default function ProfilePage() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
 
+  const [countriesCities, setCountriesCities] = useState<Record<string, string[]>>({});
+
   useEffect(() => {
     if (!isAuthenticated()) {
       router.replace("/login");
       return;
     }
+    getGlobalCountriesAndCities().then((data) => {
+      setCountriesCities(data);
+    });
     fetchProfileAndTrips();
   }, [router]);
 
@@ -195,9 +201,48 @@ export default function ProfilePage() {
                       <InputField label="Email Address" type="email" value={form.email} onChange={(v) => setForm(p => ({ ...p, email: v }))} required />
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                         <InputField label="Phone Number" value={form.phone} onChange={(v) => setForm(p => ({ ...p, phone: v }))} />
-                        <InputField label="City" value={form.city} onChange={(v) => setForm(p => ({ ...p, city: v }))} />
+                        <div>
+                          <label style={labelStyle}>Country</label>
+                          <select
+                            value={form.country}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setForm(p => ({ ...p, country: val, city: "" }));
+                            }}
+                            style={{ ...inputStyle, background: "#0d1014", marginTop: 4 }}
+                          >
+                            <option value="" style={{ background: "#0d1014" }}>Select Country</option>
+                            {Object.keys(countriesCities).map((c) => (
+                              <option key={c} value={c} style={{ background: "#0d1014" }}>{c}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                      <InputField label="Country" value={form.country} onChange={(v) => setForm(p => ({ ...p, country: v }))} />
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                        <div>
+                          <label style={labelStyle}>City</label>
+                          <select
+                            value={form.city}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setForm(p => ({ ...p, city: val }));
+                            }}
+                            disabled={!form.country}
+                            style={{
+                              ...inputStyle,
+                              background: "#0d1014",
+                              marginTop: 4,
+                              opacity: form.country ? 1 : 0.6,
+                              cursor: form.country ? "pointer" : "not-allowed"
+                            }}
+                          >
+                            <option value="" style={{ background: "#0d1014" }}>Select City</option>
+                            {form.country && countriesCities[form.country]?.map((city) => (
+                              <option key={city} value={city} style={{ background: "#0d1014" }}>{city}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
                       <div>
                         <label style={labelStyle}>Bio / Additional Information</label>
                         <textarea value={form.bio} onChange={(e) => setForm(p => ({ ...p, bio: e.target.value }))} rows={2} style={textareaStyle} />

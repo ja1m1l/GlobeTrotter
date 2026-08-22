@@ -137,8 +137,13 @@ export default function ActivitySearch() {
 
       {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-          GlobeTrotter
+        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {tripIdParam && (

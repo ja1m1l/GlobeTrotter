@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { communityApi, CommunityPostItem, getUser } from "@/lib/api";
+import { communityApi, CommunityPostItem, getUser, getGlobalCountriesAndCities } from "@/lib/api";
 
 const REGIONS = [
   { id: "all", label: "All Regions" },
@@ -47,9 +47,11 @@ export default function CommunityTab() {
 
   // Modal State for + Share Experience
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [countriesCities, setCountriesCities] = useState<Record<string, string[]>>({});
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
-  const [newLocation, setNewLocation] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [newRegion, setNewRegion] = useState("Europe");
   const [newCategory, setNewCategory] = useState("Travel Story");
   const [newImage, setNewImage] = useState("");
@@ -60,6 +62,9 @@ export default function CommunityTab() {
 
   useEffect(() => {
     setUser(getUser());
+    getGlobalCountriesAndCities().then((data) => {
+      setCountriesCities(data);
+    });
   }, []);
 
   // Fetch Community Feed Posts
@@ -122,7 +127,7 @@ export default function CommunityTab() {
       const res = await communityApi.createPost({
         title: newTitle.trim(),
         content: newContent.trim(),
-        location: newLocation.trim() || undefined,
+        location: selectedCity && selectedCountry ? `${selectedCity}, ${selectedCountry}` : 'Global',
         region: newRegion,
         category: newCategory,
         image: newImage.trim() || undefined,
@@ -130,8 +135,9 @@ export default function CommunityTab() {
 
       setPosts([res.post, ...posts]);
       setNewTitle("");
+      setSelectedCountry("");
+      setSelectedCity("");
       setNewContent("");
-      setNewLocation("");
       setNewImage("");
       setIsShareModalOpen(false);
     } catch (err: unknown) {
@@ -148,8 +154,13 @@ export default function CommunityTab() {
 
       {/* Header */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(7,9,12,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>
-          GlobeTrotter
+        <button onClick={() => router.push("/")} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 130, paddingLeft: 16, borderLeft: "1px solid rgba(255,255,255,0.12)", height: 20, display: "flex", alignItems: "center", outline: "none" }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}
+            onMouseEnter={(e) => e.currentTarget.style.color = "#2dd4bf"}
+            onMouseLeave={(e) => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+          >
+            ← Dashboard
+          </span>
         </button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <button
@@ -403,9 +414,42 @@ export default function CommunityTab() {
                 <input type="text" placeholder="e.g. 5 Days in Paris: Hidden Gems & Tips" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required style={inputStyle} />
               </div>
 
-              <div>
-                <label style={labelStyle}>Location</label>
-                <input type="text" placeholder="e.g. Paris, France" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} style={inputStyle} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div>
+                  <label style={labelStyle}>Country</label>
+                  <select
+                    value={selectedCountry}
+                    onChange={(e) => {
+                      setSelectedCountry(e.target.value);
+                      setSelectedCity("");
+                    }}
+                    style={{ ...inputStyle, background: "#0d1014" }}
+                  >
+                    <option value="" style={{ background: "#0d1014" }}>Select Country</option>
+                    {Object.keys(countriesCities).map((c) => (
+                      <option key={c} value={c} style={{ background: "#0d1014" }}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>City</label>
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => setSelectedCity(e.target.value)}
+                    disabled={!selectedCountry}
+                    style={{
+                      ...inputStyle,
+                      background: "#0d1014",
+                      opacity: selectedCountry ? 1 : 0.6,
+                      cursor: selectedCountry ? "pointer" : "not-allowed"
+                    }}
+                  >
+                    <option value="" style={{ background: "#0d1014" }}>Select City</option>
+                    {selectedCountry && countriesCities[selectedCountry]?.map((city) => (
+                      <option key={city} value={city} style={{ background: "#0d1014" }}>{city}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
