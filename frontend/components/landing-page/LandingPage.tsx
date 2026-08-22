@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { clearAuth, getUser, authApi, User } from "@/lib/api";
+import { clearAuth, getUser, authApi, dashboardApi, User, TripData } from "@/lib/api";
 
 interface Trip {
   id: string;
@@ -26,18 +26,11 @@ const REGION_IMAGES: Record<string, string> = {
 const DEFAULT_TRAVEL_IMG = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=500&auto=format&fit=crop";
 
 const REGIONS = [
-  { id: "europe", name: "Europe", count: 12 },
-  { id: "asia", name: "Asia", count: 8 },
-  { id: "americas", name: "Americas", count: 15 },
-  { id: "africa", name: "Africa", count: 5 },
-  { id: "oceania", name: "Oceania", count: 4 },
-];
-
-const INITIAL_TRIPS: Trip[] = [
-  { id: "1", title: "Summer in Paris", region: "Europe", location: "France", date: "July 2024", status: "Completed", coverImage: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400" },
-  { id: "2", title: "Tokyo Culinary Odyssey", region: "Asia", location: "Japan", date: "October 2024", status: "Completed", coverImage: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400" },
-  { id: "3", title: "Patagonia Expedition", region: "Americas", location: "Chile & Argentina", date: "March 2025", status: "Upcoming", coverImage: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400" },
-  { id: "4", title: "Safari & Victoria Falls", region: "Africa", location: "Zimbabwe", date: "December 2025", status: "Draft", coverImage: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400" },
+  { id: "europe", name: "Europe" },
+  { id: "asia", name: "Asia" },
+  { id: "americas", name: "Americas" },
+  { id: "africa", name: "Africa" },
+  { id: "oceania", name: "Oceania" },
 ];
 
 const STATUS_STYLE: Record<string, { color: string; bg: string; border: string }> = {
@@ -72,10 +65,61 @@ export default function LandingPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const [tripScope, setTripScope] = useState<"mine" | "all">("mine");
+  const [tripPage, setTripPage] = useState(1);
+  const [tripPagination, setTripPagination] = useState({ page: 1, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false });
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
-  const [trips, setTrips] = useState<Trip[]>(INITIAL_TRIPS);
+  const [regionalCounts, setRegionalCounts] = useState<Record<string, number>>({});
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [tripsLoading, setTripsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTrip, setNewTrip] = useState({ title: "", region: "Europe", location: "", date: "" });
+
+  useEffect(() => {
+    dashboardApi.getRegionalSelections({ groupBy: "region" })
+      .then((res) => {
+        const counts: Record<string, number> = {};
+        res.data.forEach((item) => { counts[item.group] = Number(item.selectionCount) || 0; });
+        setRegionalCounts(counts);
+      })
+      .catch(() => setRegionalCounts({}));
+  }, []);
+
+  useEffect(() => {
+    setTripsLoading(true);
+    dashboardApi.getPreviousTrips({
+      scope: tripScope,
+      page: tripPage,
+      limit: 6,
+      sortBy: "startDate",
+      sortOrder: "desc",
+      status: selectedFilter === "completed" || selectedFilter === "upcoming" ? selectedFilter : undefined,
+    })
+      .then((res) => {
+        setTripPagination(res.pagination);
+        setTrips(res.data.map((trip: TripData) => ({
+          id: trip.id,
+          title: trip.name,
+          region: "",
+          location: trip.description || "",
+          date: trip.startDate,
+          status: trip.status === "completed" ? "Completed" : trip.status === "upcoming" ? "Upcoming" : "Draft",
+          coverImage: trip.coverImage || undefined,
+        })));
+      })
+      .catch(() => setTrips([]))
+      .finally(() => setTripsLoading(false));
+  }, [tripScope, tripPage, selectedFilter]);
+
+  const handleTripScopeChange = (scope: "mine" | "all") => {
+    setTripScope(scope);
+    setTripPage(1);
+  };
+
+  const handleStatusChange = (status: string) => {
+    setSelectedFilter(status);
+    setTripPage(1);
+  };
 
   const handleLogout = () => {
     clearAuth();
@@ -217,7 +261,7 @@ export default function LandingPage() {
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)", zIndex: 1 }} />
                   <div style={{ position: "relative", zIndex: 2, textAlign: "left", width: "100%" }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", display: "block" }}>{r.name}</span>
-                    <span style={{ fontSize: 10, color: active ? "#2dd4bf" : "rgba(255,255,255,0.4)" }}>{r.count} trips</span>
+                    <span style={{ fontSize: 10, color: active ? "#2dd4bf" : "rgba(255,255,255,0.4)" }}>{regionalCounts[r.name] ?? 0} trips</span>
                   </div>
                 </button>
               );
@@ -237,8 +281,9 @@ export default function LandingPage() {
             />
           </div>
           {/* Dropdowns */}
-          {[
-            { value: selectedFilter, onChange: setSelectedFilter, options: [["all","All Status"],["completed","Completed"],["upcoming","Upcoming"],["draft","Draft"]] },
+          {[ 
+            { value: tripScope, onChange: (value: string) => handleTripScopeChange(value as "mine" | "all"), options: [["mine","My Trips"],["all","All Trips"]] },
+            { value: selectedFilter, onChange: handleStatusChange, options: [["all","All Status"],["completed","Completed"],["upcoming","Upcoming"],["draft","Draft"]] },
             { value: sortBy, onChange: setSortBy, options: [["recent","Sort: Recent"],["title","Sort: Title"],["region","Sort: Region"]] },
           ].map((sel, i) => (
             <select key={i} value={sel.value} onChange={(e) => sel.onChange(e.target.value)}
@@ -253,8 +298,8 @@ export default function LandingPage() {
         <section>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.85)", letterSpacing: "0.01em", margin: 0 }}>
-              {selectedFilter === "all" ? "All Trips" : selectedFilter === "completed" ? "Completed Trips" : selectedFilter === "upcoming" ? "Upcoming Trips" : "Draft Trips"}
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: 400, marginLeft: 8 }}>({filteredTrips.length})</span>
+              {tripScope === "all" ? "All Trips" : "My Trips"}{selectedFilter !== "all" ? ` · ${selectedFilter[0].toUpperCase()}${selectedFilter.slice(1)} Trips` : ""}
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", fontWeight: 400, marginLeft: 8 }}>({tripPagination.total})</span>
             </h2>
             <Link href="/trips" style={{ fontSize: 12, color: "#2dd4bf", fontWeight: 600, textDecoration: "none" }}
               onMouseEnter={(e) => e.currentTarget.style.color = "#14b8a6"}
@@ -263,7 +308,9 @@ export default function LandingPage() {
               View Detailed Listing →
             </Link>
           </div>
-          {filteredTrips.length === 0 ? (
+          {tripsLoading ? (
+            <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Loading trips...</div>
+          ) : filteredTrips.length === 0 ? (
             <div style={{ ...glassCard, padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>🗺️</div>
               No trips match your current filters.
@@ -299,6 +346,29 @@ export default function LandingPage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+          {tripPagination.totalPages > 1 && (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginTop: 18 }}>
+              <button
+                type="button"
+                disabled={!tripPagination.hasPreviousPage}
+                onClick={() => setTripPage((page) => Math.max(1, page - 1))}
+                style={paginationButtonStyle}
+              >
+                ← Previous
+              </button>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+                Page {tripPagination.page} of {tripPagination.totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={!tripPagination.hasNextPage}
+                onClick={() => setTripPage((page) => page + 1)}
+                style={paginationButtonStyle}
+              >
+                Next →
+              </button>
             </div>
           )}
         </section>
@@ -385,4 +455,15 @@ const glassCard: React.CSSProperties = {
   padding: "20px",
   backdropFilter: "blur(12px)",
   WebkitBackdropFilter: "blur(12px)",
+};
+
+const paginationButtonStyle: React.CSSProperties = {
+  padding: "8px 12px",
+  background: "rgba(255,255,255,0.05)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: 8,
+  color: "rgba(255,255,255,0.7)",
+  fontSize: 12,
+  fontFamily: "inherit",
+  cursor: "pointer",
 };

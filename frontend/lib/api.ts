@@ -252,7 +252,28 @@ export const dashboardApi = {
   getDashboard: () =>
     apiFetch<DashboardResponse>("/api/dashboard"),
 
+  getRegionalSelections: (params?: {
+    groupBy?: "region" | "country";
+    sortBy?: "selectionCount" | "uniqueTravelerCount" | "name";
+    sortOrder?: "asc" | "desc";
+  }) => {
+    const query = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => query.set(key, value));
+    }
+    return apiFetch<{
+      success: boolean;
+      message: string;
+      data: Array<{
+        group: string;
+        selectionCount: number;
+        uniqueTravelerCount: number;
+      }>;
+    }>(`/api/dashboard/regional-selections?${query.toString()}`);
+  },
+
   getPreviousTrips: (params?: {
+    scope?: "mine" | "all";
     search?: string;
     status?: string;
     sortBy?: string;

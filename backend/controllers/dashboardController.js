@@ -295,6 +295,7 @@ exports.getPreviousTrips = async (req, res) => {
     const {
       search,
       status,
+      scope = 'mine',
       startDateFrom,
       startDateTo,
       endDateFrom,
@@ -324,8 +325,15 @@ exports.getPreviousTrips = async (req, res) => {
       });
     }
 
-    // Base query filters
-    const where = { userId };
+    if (scope !== 'mine' && scope !== 'all') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid scope parameter. Allowed values: mine, all'
+      });
+    }
+
+    // Default to the authenticated user's trips; all trips require explicit scope=all.
+    const where = scope === 'all' ? {} : { userId };
 
     // Search filter (searches in trip name or description)
     if (search) {
