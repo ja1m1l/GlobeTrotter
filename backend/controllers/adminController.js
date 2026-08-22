@@ -12,7 +12,13 @@ exports.getAnalytics = async (req, res) => {
     const totalActivities = await prisma.activity.count();
     const totalCommunityPosts = await prisma.communityPost.count();
 
-    // Top Cities
+    // Total Budget Managed across all created trips
+    const budgetAgg = await prisma.trip.aggregate({
+      _sum: { maxBudget: true },
+    });
+    const totalBudgetManaged = budgetAgg._sum.maxBudget || 0;
+
+    // Top Booked Cities dynamically from tripStops
     const cityStops = await prisma.tripStop.groupBy({
       by: ['cityId'],
       _count: { cityId: true },
@@ -20,63 +26,133 @@ exports.getAnalytics = async (req, res) => {
       take: 5,
     });
 
-    const popularCities = await Promise.all(
+    let popularCities = await Promise.all(
       cityStops.map(async (item) => {
         const city = await prisma.city.findUnique({ where: { id: item.cityId } });
         return {
           id: item.cityId,
-          name: city ? `${city.name}, ${city.country}` : 'Paris, France',
-          tripsCount: item._count.cityId * 12 + 45, // scale for visual analytics
+          name: city ? `${city.name}, ${city.country}` : 'Unknown City',
+          tripsCount: item._count.cityId,
         };
       })
     );
 
-    // Default popular cities fallback if empty
-    if (popularCities.length === 0) {
-      popularCities.push(
-        { id: "c1", name: "Paris, France", tripsCount: 124 },
-        { id: "c2", name: "Mumbai, India", tripsCount: 98 },
-        { id: "c3", name: "Dubai, UAE", tripsCount: 87 },
-        { id: "c4", name: "Tokyo, Japan", tripsCount: 76 },
-        { id: "c5", name: "Zurich, Switzerland", tripsCount: 65 }
+    // If city stops are few, supplement with top cities from database
+    if (popularCities.length < 5) {
+      const remainingCities = await prisma.city.findMany({
+        where: { id: { notIn: popularCities.map((c) => c.id) } },
+        take: 5 - popularCities.length,
+        orderBy: { popularity: 'desc' },
+      });
+      remainingCities.forEach((city) => {
+        popularCities.push({
+          id: city.id,
+          name: `${city.name}, ${city.country}`,
+          tripsCount: Math.round((city.popularity || 80) / 10),
+        });
+      });
+    }
+
+    // Top Booked Activities dynamically from tripActivities
+    const activityStops = await prisma.tripActivity.groupBy({
+      by: ['activityId'],
+      _count: { activityId: true },
+      orderBy: { _count: { activityId: 'desc' } },
+      take: 5,
+    });
+
+    let popularActivities = await Promise.all(
+      activityStops.map(async (item) => {
+        const act = await prisma.activity.findUnique({ where: { id: item.activityId } });
+        return {
+          name: act ? act.title : 'Popular Activity',
+          category: act ? act.category : 'Sightseeing',
+          count: item._count.activityId,
+        };
+      })
+    );
+
+    // Supplement with top activities if tripActivity links are fresh
+    if (popularActivities.length < 5) {
+      const remainingActivities = await prisma.activity.findMany({
+        take: 5 - popularActivities.length,
+        orderBy: { rating: 'desc' },
+      });
+      remainingActivities.forEach((act) => {
+        popularActivities.push({
+          name: act.title,
+          category: act.category,
+          count: Math.round((act.popularity || 85) / 5),
+        });
+      });
+    }
+
+    // Dynamic Monthly Trip Trends (Last 7 Months)
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const tripTrends = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const nextD = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+
+      const monthTrips = await prisma.trip.count({
+        where: {
+          createdAt: {
+            gte: d,
+            lt: nextD,
+          },
+        },
+      });
+
+      const monthUsers = await prisma.user.count({
+        where: {
+          createdAt: {
+            gte: d,
+            lt: nextD,
+          },
+        },
+      });
+
+      tripTrends.push({
+        month: monthNames[d.getMonth()],
+        trips: monthTrips,
+        users: monthUsers,
+      });
+    }
+
+    // Dynamic Region Share Distribution from Cities & TripStops
+    const regionGroup = await prisma.city.groupBy({
+      by: ['region'],
+      _count: { region: true },
+    });
+
+    const totalRegionCount = regionGroup.reduce((acc, curr) => acc + curr._count.region, 0) || 1;
+    const regionColors = { Europe: "#2dd4bf", Asia: "#3b82f6", Americas: "#a855f7", Africa: "#f59e0b", Oceania: "#ec4899" };
+
+    const regionDistribution = regionGroup.map((rg) => ({
+      region: rg.region || "Other",
+      percentage: Math.round((rg._count.region / totalRegionCount) * 100),
+      color: regionColors[rg.region] || "#64748b",
+    }));
+
+    if (regionDistribution.length === 0) {
+      regionDistribution.push(
+        { region: "Europe", percentage: 45, color: "#2dd4bf" },
+        { region: "Asia", percentage: 30, color: "#3b82f6" },
+        { region: "Americas", percentage: 15, color: "#a855f7" },
+        { region: "Other", percentage: 10, color: "#f59e0b" }
       );
     }
 
-    // Top Activities
-    const popularActivities = [
-      { name: "Eiffel Tower Priority Summit Pass", category: "Sightseeing", count: 120 },
-      { name: "Tokyo Tsukiji Market Food Tour", category: "Food & Dining", count: 95 },
-      { name: "Swiss Alps First Cliff Walk", category: "Adventure", count: 82 },
-      { name: "Colosseum Underground Tour", category: "Culture & History", count: 71 },
-      { name: "Montmartre Bakery & Wine Tasting", category: "Food & Dining", count: 64 },
-    ];
-
-    // Trip Trends Over Time (Jan - Jul)
-    const tripTrends = [
-      { month: "Jan", trips: 280, users: 420 },
-      { month: "Feb", trips: 450, users: 590 },
-      { month: "Mar", trips: 620, users: 780 },
-      { month: "Apr", trips: 890, users: 950 },
-      { month: "May", trips: 1120, users: 1100 },
-      { month: "Jun", trips: 1450, users: 1320 },
-      { month: "Jul", trips: 1840, users: 1540 },
-    ];
-
-    // Region Pie Chart Distribution
-    const regionDistribution = [
-      { region: "Europe", percentage: 45, color: "#2dd4bf" },
-      { region: "Asia", percentage: 30, color: "#3b82f6" },
-      { region: "Americas", percentage: 15, color: "#a855f7" },
-      { region: "Other", percentage: 10, color: "#f59e0b" },
-    ];
-
     return res.json({
       analytics: {
-        totalUsers: totalUsers || 1250,
-        activeUsers: activeUsers || 840,
-        totalTrips: totalTrips || 3420,
-        totalActivities: totalActivities || 140,
-        totalCommunityPosts: totalCommunityPosts || 88,
+        totalUsers,
+        activeUsers,
+        totalTrips,
+        totalActivities,
+        totalCommunityPosts,
+        totalBudgetManaged,
         popularCities,
         popularActivities,
         tripTrends,

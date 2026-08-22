@@ -604,6 +604,7 @@ export interface AdminAnalyticsData {
   totalTrips: number;
   totalActivities: number;
   totalCommunityPosts: number;
+  totalBudgetManaged: number;
   popularCities: Array<{ id: string; name: string; tripsCount: number }>;
   popularActivities: Array<{ name: string; category: string; count: number }>;
   tripTrends: Array<{ month: string; trips: number; users: number }>;
